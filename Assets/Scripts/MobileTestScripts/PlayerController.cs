@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+public enum AnimState
+{
+    None,
+    Idle,
+    IsRun,
+    IsJump,
+}
 public class PlayerController : MonoBehaviour
 {
-    enum AnimState
-    {
-        None,
-        Idle,
-        IsRun,
-        IsJump,
-    }
 
     [Header("ANIMATOR COMPONENT")]
     [SerializeField] private Animator _animator;
@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
         bool isValid = this.isValid();
         if (false == isValid && Input.GetKeyDown(KeyCode.Space))
         {
-            StartCoroutine(ResetState(AnimState.IsJump));
+            ActionAnim(AnimState.IsJump);
             //Debug.Log(nameof(AnimState.IsJump));
         }
         else if (false == isValid && (0f != moveHorizontal || 0f != moveVertical))
@@ -82,6 +82,11 @@ public class PlayerController : MonoBehaviour
             ChangeState(AnimState.Idle);
             //Debug.Log(nameof(AnimState.Idle));
         }
+    }
+
+    public void ActionAnim(AnimState argState)
+    {
+        StartCoroutine(ResetState(argState));
     }
 
     private IEnumerator ResetState(AnimState argState)

@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class UIManager : MonoBehaviour
+public class UIManagerIngame : MonoBehaviour
 {
     #region [Singleton]
     private static readonly object lockObject = new object();
-    private static UIManager instance;
+    private static UIManagerIngame instance;
 
-    public static UIManager Instance
+    public static UIManagerIngame Instance
     {
         get
         {
@@ -17,11 +18,11 @@ public class UIManager : MonoBehaviour
             {
                 if (instance == null)
                 {
-                    instance = FindObjectOfType<UIManager>();
+                    instance = FindObjectOfType<UIManagerIngame>();
                     if (instance == null)
                     {
                         GameObject gameObject = new GameObject("UIManager(Ingame)");
-                        gameObject.AddComponent<UIManager>();
+                        gameObject.AddComponent<UIManagerIngame>();
                         DontDestroyOnLoad(gameObject);
                     }
                 }
@@ -40,7 +41,7 @@ public class UIManager : MonoBehaviour
             return;
 
         GameObject gameObject = new GameObject("UIManager(Ingame)");
-        gameObject.AddComponent<UIManager>();
+        gameObject.AddComponent<UIManagerIngame>();
         DontDestroyOnLoad(gameObject);
     }
     #endregion

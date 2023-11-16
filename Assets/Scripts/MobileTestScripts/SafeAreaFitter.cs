@@ -8,37 +8,39 @@ public class SafeAreaFitter : MonoBehaviour
     private RectTransform panel;
     private Rect lastSafeArea = new Rect(0, 0, 0, 0);
     private Vector2 lastScreenSize = Vector2.zero;
+    private ScreenOrientation lastOrientation;
+
     private void Awake()
     {
         panel = GetComponent<RectTransform>();
-
     }
     private async void Start()
     {
-        var originalResolution = new Vector2(Screen.width, Screen.height);
-        //Screen.autorotateToPortrait = false;
-        //Screen.autorotateToPortraitUpsideDown= false;
-        // Temporarily change the resolution
-        Screen.SetResolution(1, 1, Screen.fullScreen);
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+        Screen.autorotateToLandscapeLeft = true;
+        Screen.autorotateToLandscapeRight = true;
         await UniTask.WaitForEndOfFrame(this);
+        await UniTask.Delay(1000);
         ApplySafeArea(Screen.safeArea);
-        //// Revert the resolution
-        Screen.SetResolution((int)originalResolution.x, (int)originalResolution.y, Screen.fullScreen);
+        lastOrientation = Screen.orientation;
+        //Refresh();
     }
     private void Update()
     {
-        // Check if the screen size or orientation has changed
-        if (Screen.width != lastScreenSize.x || Screen.height != lastScreenSize.y)
+        if (Screen.width != lastScreenSize.x || Screen.height != lastScreenSize.y || Screen.orientation != lastOrientation)
         {
             lastScreenSize = new Vector2(Screen.width, Screen.height);
+            lastOrientation = Screen.orientation;
             Refresh();
         }
     }
 
+
     private void Refresh()
     {
         Rect safeArea = GetSafeArea();
-
         if (safeArea != lastSafeArea)
             ApplySafeArea(safeArea);
     }

@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MobileOutGame.unity
+    guid: e0c97ff65f44787428274da822f41d37
+  - enabled: 1
+    path: Assets/Scenes/MobileInGameTestScene.unity
+    guid: 6ce997bb8f1101e4282d7854adad53c7
   m_configObjects: {}

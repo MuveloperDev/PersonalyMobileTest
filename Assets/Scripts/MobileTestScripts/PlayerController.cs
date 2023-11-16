@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -19,6 +20,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AnimState _curState;
     [Header("PLAYER CONTROLLER")]
     [SerializeField] private VirtualJoystick _joystick;
+    [Header("ACTION BUTTON MGR")]
+    [SerializeField] private ActionButtonManager _buttonManager;
     [Header("PLAYER INFO")]
     [SerializeField] float speed = 5f;  // 캐릭터 이동 속도
     [SerializeField] private float moveHorizontal;
@@ -26,8 +29,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rotationSpeed = 30f;
     [SerializeField] private bool _isJumping = false;
 
-    private void Awake()
+    private async void Awake()
     {
+        await UniTask.WaitUntil( ()=> 0 != _buttonManager.GetBtnDic().Count);
         Initialized();
     }
 
@@ -66,12 +70,7 @@ public class PlayerController : MonoBehaviour
     private void SetAnim()
     {
         bool isValid = this.isValid();
-        if (false == isValid && Input.GetKeyDown(KeyCode.Space))
-        {
-            ActionAnim(AnimState.IsJump);
-            //Debug.Log(nameof(AnimState.IsJump));
-        }
-        else if (false == isValid && (0f != moveHorizontal || 0f != moveVertical))
+        if (false == isValid && (0f != moveHorizontal || 0f != moveVertical))
         {
             //_animator.Play(nameof(AnimState.IsRun));
             ChangeState(AnimState.IsRun);
@@ -84,16 +83,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void ActionAnim(AnimState argState)
-    {
-        StartCoroutine(ResetState(argState));
-    }
+    public void ActionAnim(AnimState argState)=> ResetState(argState).Forget();
 
-    private IEnumerator ResetState(AnimState argState)
+    private async UniTask ResetState(AnimState argState)
     {
         SetFlag(argState, true);
         ChangeState(argState);
-        yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
+        await UniTask.WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length - 1f);
         SetFlag(argState, false);
     }
 
@@ -110,13 +106,18 @@ public class PlayerController : MonoBehaviour
     private void Initialized()
     {
         _curState = AnimState.None;
+        var buttonDic = _buttonManager.GetBtnDic();
+
+        buttonDic[ActionButtonManager.ActionButtons.NormalAttack].onAction = ()=> { ActionAnim(AnimState.IsJump); };
     }
 
     void ChangeState(AnimState argState)
     {
+        if (argState == _curState)
+            return;
+
         _curState = argState;
         _animator.Play(argState.ToString());
-        Debug.Log(argState);
     }
 
     void SetFlag(AnimState argState, bool argValue)

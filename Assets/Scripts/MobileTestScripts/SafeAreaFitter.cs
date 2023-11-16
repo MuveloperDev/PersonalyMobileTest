@@ -16,10 +16,11 @@ public class SafeAreaFitter : MonoBehaviour
     private async void Start()
     {
         var originalResolution = new Vector2(Screen.width, Screen.height);
-
-        await UniTask.WaitForEndOfFrame(this);
+        //Screen.autorotateToPortrait = false;
+        //Screen.autorotateToPortraitUpsideDown= false;
         // Temporarily change the resolution
         Screen.SetResolution(1, 1, Screen.fullScreen);
+        await UniTask.WaitForEndOfFrame(this);
         ApplySafeArea(Screen.safeArea);
         //// Revert the resolution
         Screen.SetResolution((int)originalResolution.x, (int)originalResolution.y, Screen.fullScreen);

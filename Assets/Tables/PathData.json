@@ -1,0 +1,22 @@
+{
+  "Prefabs": [
+    {
+      "path": "Assets/Prefabs/IngameCanvas.prefab",
+      "name": "IngameCanvas"
+    },
+    {
+      "path": "Assets/Prefabs/IngameInputSystem.prefab",
+      "name": "IngameInputSystem"
+    },
+    {
+      "path": "Assets/Prefabs/SafeArea.prefab",
+      "name": "SafeArea"
+    }
+  ],
+  "Tables": [
+    {
+      "path": "Assets/Tables/PathData.json",
+      "name": "PathData"
+    }
+  ]
+}

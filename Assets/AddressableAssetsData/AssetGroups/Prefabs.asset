@@ -15,7 +15,7 @@ MonoBehaviour:
   m_GroupName: Prefabs
   m_Data:
     m_SerializedData: []
-  m_GUID: 36c23d23b35439e468036fbac71da6af
+  m_GUID: 1413e42b3e1843b49ac9082263da8c14
   m_SerializeEntries:
   - m_GUID: 6e84e23100895e94db541ae88770aecd
     m_Address: Assets/Prefabs/IngameCanvas.prefab
@@ -29,6 +29,16 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0c189310d563c33449a3ebc3f1dc5348
     m_Address: Assets/Prefabs/SafeArea.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 316c55738638423478fa171f9bcffe28
+    m_Address: Assets/Prefabs/UIBaseTest1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac9b71dca642607489172c0ce28c6757
+    m_Address: Assets/Prefabs/UIBaseTest2.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

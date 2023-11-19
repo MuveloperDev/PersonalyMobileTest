@@ -14,24 +14,25 @@ public enum AnimState
 public class PlayerController : MonoBehaviour
 {
 
-    [Header("ANIMATOR COMPONENT")]
+    [Header("DEPENDENCY")]
     [SerializeField] private Animator _animator;
+    [SerializeField] private VirtualJoystick _joystick;
+    [SerializeField] private ActionButtonManager _buttonManager;
+
     [Header("CURRENT STATE")]
     [SerializeField] private AnimState _curState;
-    [Header("PLAYER CONTROLLER")]
-    [SerializeField] private VirtualJoystick _joystick;
-    [Header("ACTION BUTTON MGR")]
-    [SerializeField] private ActionButtonManager _buttonManager;
+    
     [Header("PLAYER INFO")]
     [SerializeField] float speed = 5f;  // 캐릭터 이동 속도
     [SerializeField] private float moveHorizontal;
     [SerializeField] private float moveVertical;
     [SerializeField] private float rotationSpeed = 30f;
     [SerializeField] private bool _isJumping = false;
-
+    [SerializeField] private bool _isInitialized = false;
     private async void Awake()
     {
-        await UniTask.WaitUntil( ()=> 0 != _buttonManager.GetBtnDic().Count);
+        await UniTask.WaitUntil(() => null != IngameUIManager.Instance.InputSystem);
+        //await UniTask.WaitUntil( ()=> 0 != _buttonManager.GetBtnDic().Count);
         Initialized();
     }
 
@@ -42,6 +43,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (false == _isInitialized)
+            return;
+
         Move();
         SetAnim();
     }
@@ -72,7 +76,6 @@ public class PlayerController : MonoBehaviour
         bool isValid = this.isValid();
         if (false == isValid && (0f != moveHorizontal || 0f != moveVertical))
         {
-            //_animator.Play(nameof(AnimState.IsRun));
             ChangeState(AnimState.IsRun);
             //Debug.Log(nameof(AnimState.IsRun));
         }
@@ -106,9 +109,15 @@ public class PlayerController : MonoBehaviour
     private void Initialized()
     {
         _curState = AnimState.None;
+        _buttonManager = IngameUIManager.Instance.InputSystem.GetActionButtonManager();
+        _joystick = IngameUIManager.Instance.InputSystem.GetJoystick();
+
         var buttonDic = _buttonManager.GetBtnDic();
 
-        buttonDic[ActionButtonManager.ActionButtons.NormalAttack].onAction = ()=> { ActionAnim(AnimState.IsJump); };
+        //buttonDic[ActionButtonManager.ActionButtons.NormalAttack].onAction = ()=> { };
+        buttonDic[ActionButtonManager.ActionButtons.NormalAttack].GetButton().OnClickUpAddLitener(() => { ActionAnim(AnimState.IsJump); });
+
+        _isInitialized = true;
     }
 
     void ChangeState(AnimState argState)

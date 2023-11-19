@@ -11,6 +11,14 @@
     {
       "path": "Assets/Prefabs/SafeArea.prefab",
       "name": "SafeArea"
+    },
+    {
+      "path": "Assets/Prefabs/UIBaseTest1.prefab",
+      "name": "UIBaseTest1"
+    },
+    {
+      "path": "Assets/Prefabs/UIBaseTest2.prefab",
+      "name": "UIBaseTest2"
     }
   ],
   "Tables": [

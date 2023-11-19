@@ -10,8 +10,8 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        _offsetPos = new Vector3(0, 2.7f, -4.3f);
-        _offsetRot = new Quaternion(22.53f, 0, 0,0);
+        _offsetPos = new Vector3(5.61f, 6.29f, -3.74f);
+        _offsetRot = new Quaternion(39.357f, -57.05f, 0,0);
     }
     // Start is called before the first frame update
     void Start()

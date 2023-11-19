@@ -15,7 +15,7 @@ MonoBehaviour:
   m_GroupName: Tables
   m_Data:
     m_SerializedData: []
-  m_GUID: aa8acfcf74b51fe40b6fe95635bf8fdb
+  m_GUID: 00f6abe7c8ac02749a7c50228091b0e9
   m_SerializeEntries:
   - m_GUID: 89a390c723069d24faf6d86124e3bff2
     m_Address: Assets/Tables/PathData.json

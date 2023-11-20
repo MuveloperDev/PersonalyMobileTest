@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,21 +16,15 @@ public class RadialProgress
     [SerializeField] private float _duration;
     [SerializeField] private float _speed;
     [SerializeField] private MonoBehaviour _coroutineRunner;
+    [SerializeField] private CancellationTokenSource _cts;
 
     public RadialProgress(float argDuration, MonoBehaviour argCoroutineRunner, Image argRadiusImg)
     {
         _duration = argDuration;
         _coroutineRunner = argCoroutineRunner;
         _radiusImg = argRadiusImg;
+        _cts = new CancellationTokenSource();
         Initialized();
-    }
-
-    private void Initialized()
-    {
-        _curPercentValue = 100;
-        _speed = _curPercentValue / _duration;
-        _cacledForce = false;
-        _isProgress = false;
     }
 
     public void Interaction()
@@ -44,16 +39,28 @@ public class RadialProgress
         _cacledForce = true;
     }
 
+    public CancellationTokenSource GetCTS() => _cts;
     public bool GetProgress() => _isProgress;
     public void SetTime(float argTime) => _duration = argTime;
     public void SetActive(bool isActive) => _radiusImg.gameObject.SetActive(isActive);
 
+    private void Initialized()
+    {
+        _curPercentValue = 100;
+        _speed = _curPercentValue / _duration;
+        _cacledForce = false;
+        _isProgress = false;
+    }
 
-    private async UniTask Progress()
+    private async UniTask Progress(CancellationToken cancellationToken = default(CancellationToken))
     {
         while (true)
         {
             await UniTask.WaitForEndOfFrame(_coroutineRunner);
+
+            if (true == cancellationToken.IsCancellationRequested)
+                break;
+
             if (true == _cacledForce)
             {
                 Initialized();

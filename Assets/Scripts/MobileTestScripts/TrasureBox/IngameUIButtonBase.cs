@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,14 +7,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Button))]
-public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+public class IngameUIButtonBase : IngameUIEventHandler
 {
     public enum InGameButtonMode
     {
         None = -1,
         Drag,
         DragAndDrop,
-        JoystickAndDragDrop,
         Customize   // 추후 구현예정.
     }
     [Header("MODE")]
@@ -24,24 +24,10 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
     [SerializeField] private IngameDragAndDropButton _dragAndDropDestBtn;
     [SerializeField] private RectTransform _dragAndDropDestBtnRect;
     [SerializeField] private Image _dragGhostImage;
-    [SerializeField] private IngameVirtualJoystickBase _joystick;
 
-    [Header("FLAGS")]
-    [SerializeField] private bool _isArriveAtTheDest = false;
+    [Header("Flags")]
+    [SerializeField] private bool _useGhostImage;
 
-    #region [Button_Interaction_Handler]
-    private Action _onClickDownEvent;
-    public void OnClickDownAddLitener(Action argEvent) => _onClickDownEvent += argEvent;
-
-    private Action _onClickUpEvent;
-    public void OnClickUpAddLitener(Action argEvent) => _onClickUpEvent += argEvent;
-
-    private Action<PointerEventData> _onClickDragEvent;
-    public void OnClickDragAddLitener(Action<PointerEventData> argEvent) => _onClickDragEvent += argEvent;
-
-    private Vector2 _dragPos;
-    public Vector2 dragPos { get { return _dragPos; } private set { } }
-    #endregion
 
     void Awake()
     {
@@ -52,35 +38,22 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
     }
 
     
-    public void OnPointerDown(PointerEventData eventData)
+    public override void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("TouchDown");
-        // 터치 다운 이벤트 처리 코드
-        if (null != _onClickDownEvent)
-            _onClickDownEvent();
-
+        base.OnPointerDown(eventData);
         OnClickDownEventBasedOnMode(eventData);
-
-        if (true == _isArriveAtTheDest)
-            _isArriveAtTheDest = false;
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
-        // 터치 업 이벤트 처리 코드
-        if (null != _onClickUpEvent && false == _isArriveAtTheDest)
-            _onClickUpEvent();
-
-        Debug.Log("TouchUp");
-        OnClickUpEventBasedOnMode();
+        base.OnPointerUp(eventData);
         _dragPos = transform.position;
+        OnClickUpEventBasedOnMode();
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public override void OnDrag(PointerEventData eventData)
     {
-        if (null != _onClickDragEvent)
-            _onClickDragEvent(eventData);
-
+        base.OnDrag(eventData);
         _dragPos = eventData.position;
         OnDragEventBasedOnMode(eventData);
     }
@@ -103,11 +76,8 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
             case InGameButtonMode.Drag:
                 break;
             case InGameButtonMode.DragAndDrop:
-                ActiveDragGhost();
-                break;
-            case InGameButtonMode.JoystickAndDragDrop:
-                ActiveDragGhost();
-                _joystick.OnShow(eventData);
+                if (true == _useGhostImage)
+                    ActiveDragGhost();
                 break;
             case InGameButtonMode.Customize:
                 break;
@@ -125,15 +95,13 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
             case InGameButtonMode.Drag:
                 break;
             case InGameButtonMode.DragAndDrop:
-                OnPointerUpEventDragGhost();
-                break;
-            case InGameButtonMode.JoystickAndDragDrop:
-                OnPointerUpEventDragGhost();
-                _joystick.OnHide();
+                if (null != _dragAndDropDestBtn && true == _isArriveAtTheDest)
+                    _dragAndDropDestBtn.OnPointerExit();
+
+                if (true == _useGhostImage)
+                    OnPointerUpEventDragGhost();
                 break;
             case InGameButtonMode.Customize:
-                break;
-            default:
                 break;
         }
     }
@@ -147,43 +115,16 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
             case InGameButtonMode.Drag:
                 break;
             case InGameButtonMode.DragAndDrop:
-                UpdateGhostDragImagePosition();
                 DetectRollOverDragAndDropDestButton();
-                break;
-            case InGameButtonMode.JoystickAndDragDrop:
-                UpdateGhostDragImagePosition();
-                DetectRollOverDragAndDropDestButton();
-                _joystick.HandleJoystickInput(eventData);
+
+                if (true == _useGhostImage)
+                    UpdateGhostDragImagePosition();
                 break;
             case InGameButtonMode.Customize:
                 break;
-            default:
-                break;
         }
     }
 
-    private void ActiveDragGhost()
-    {
-        if (null == _dragGhostImage)
-        {
-            InstatiateGhost();
-        }
-        else
-        {
-            _dragGhostImage.gameObject.SetActive(true);
-        }
-    }
-
-    private void OnPointerUpEventDragGhost()
-    {
-        if (null != _dragAndDropDestBtn && true == _isArriveAtTheDest)
-        {
-            // 이 캔슬 부분은 동필님이랑 이야기 해볼것.
-            // 일단은 캔슬버튼에 델리게이트로 빼두었지만 사용성을 위해 생각해볼것.
-            _dragAndDropDestBtn.OnPointerExit();
-        }
-        DisableGhostDragImage();
-    }
 
     private void DetectRollOverDragAndDropDestButton()
     {
@@ -201,14 +142,15 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
 
             _isArriveAtTheDest = true;
             _dragAndDropDestBtn.OnPointerEnter();
+            return;
         }
-        else
-        {
-            if (true == _isArriveAtTheDest)
-                _isArriveAtTheDest = false;
-        }
+
+        if (true == _isArriveAtTheDest)
+            _isArriveAtTheDest = false;
     }
 
+
+    #region [Ghost_Function]
     private void InstatiateGhost()
     {
         // 어드레서블로 교체예정
@@ -216,6 +158,22 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
         var button = _dragGhostImage.GetComponent<IngameUIButtonBase>();
         button.enabled = false;
         _dragGhostImage.color = new Color(1, 1, 1, 0.5f);
+    }
+    private void ActiveDragGhost()
+    {
+        if (null == _dragGhostImage)
+        {
+            InstatiateGhost();
+        }
+        else
+        {
+            _dragGhostImage.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnPointerUpEventDragGhost()
+    {
+        DisableGhostDragImage();
     }
 
     private void DisableGhostDragImage()
@@ -234,5 +192,5 @@ public class IngameUIButtonBase : MonoBehaviour, IPointerDownHandler, IPointerUp
 
         _dragGhostImage.transform.position = Input.mousePosition;
     }
-
+    #endregion
 }

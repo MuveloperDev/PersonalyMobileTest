@@ -158,7 +158,6 @@ public class AssetManager
             {
                 // 애셋 인스턴스 생성 성공
                 assetInstance = handle.Result;
-                // 여기에서 assetInstance를 사용하여 필요한 처리를 수행
             }
             else
             {

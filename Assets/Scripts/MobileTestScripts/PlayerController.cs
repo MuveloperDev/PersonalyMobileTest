@@ -55,12 +55,21 @@ public class PlayerController : MonoBehaviour
         bool isValid = this.isValid();
         if (true == isValid)
             return;
-        //moveHorizontal = Input.GetAxis("Horizontal");  // 수평 이동
-        //moveVertical = Input.GetAxis("Vertical");  // 수직 이동
         moveHorizontal = _joystick.GetHorizontal();  // 수평 이동
         moveVertical = _joystick.GetVertical();  // 수직 이동
 
-        Vector3 movement = new Vector3(moveHorizontal, 0, moveVertical);
+        // 카메라의 회전 적용하기
+        Camera cam = Camera.main;  // 메인 카메라 가져오기
+        Vector3 camForward = cam.transform.forward;  // 카메라의 전방향 벡터 가져오기
+        camForward.y = 0;  // y 축은 0으로 설정 (수평 이동만 고려)
+        camForward.Normalize();  // 정규화 (길이를 1로 만들기)
+
+        Vector3 camRight = cam.transform.right;  // 카메라의 오른쪽 방향 벡터 가져오기
+        camRight.y = 0;  // y 축은 0으로 설정
+        camRight.Normalize();  // 정규화
+
+        // 이동 벡터를 카메라의 방향에 맞게 변환
+        Vector3 movement = camRight * moveHorizontal + camForward * moveVertical;
 
         if (movement != Vector3.zero) // movement가 0이 아닐 때만 회전
         {
@@ -68,7 +77,7 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * rotationSpeed);
         }
 
-        transform.position += new Vector3(moveHorizontal, 0, moveVertical) * speed * Time.deltaTime;
+        transform.position += movement * speed * Time.deltaTime;
     }
 
     private void SetAnim()
@@ -115,7 +124,7 @@ public class PlayerController : MonoBehaviour
         var buttonDic = _buttonManager.GetBtnDic();
 
         //buttonDic[ActionButtonManager.ActionButtons.NormalAttack].onAction = ()=> { };
-        buttonDic[ActionButtonManager.ActionButtons.NormalAttack].GetButton().OnClickUpAddLitener(() => { ActionAnim(AnimState.IsJump); });
+        buttonDic[ActionButtonManager.ActionButtons.NormalAttack].GetButton().OnClickUpAddLitener((eventData) => { ActionAnim(AnimState.IsJump); });
 
         _isInitialized = true;
     }

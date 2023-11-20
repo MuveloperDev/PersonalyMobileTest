@@ -13,6 +13,7 @@ public class IngameVirtualJoystickBase : MonoBehaviour
 
     [Header("INPUT VECTOR")]
     [SerializeField] protected Vector2 inputVector;
+    [SerializeField] protected Vector2 inputDir;
 
     public float GetHorizontal() => inputVector.x;
 
@@ -51,7 +52,7 @@ public class IngameVirtualJoystickBase : MonoBehaviour
 
             joystickHandle.anchoredPosition = new Vector2(inputVector.x * (joystickBackground.sizeDelta.x / 3), inputVector.y * (joystickBackground.sizeDelta.y / 3));
         }
-        Vector2 inputDir = eventData.position - joystickBackground.anchoredPosition;
+        inputDir = eventData.position - joystickBackground.anchoredPosition;
         //Debug.Log($"inputDir.x :{GetHorizontal()} / inputDir.y : {GetVertical()}");
     }
 }

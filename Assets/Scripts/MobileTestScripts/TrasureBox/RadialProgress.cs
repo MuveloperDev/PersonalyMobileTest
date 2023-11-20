@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,20 +24,18 @@ public class RadialProgress
         _duration = argDuration;
         _coroutineRunner = argCoroutineRunner;
         _radiusImg = argRadiusImg;
-        _cts = new CancellationTokenSource();
         Initialized();
     }
 
-    public void Interaction()
+    public void Interaction(Action onAction = null)
     {
         SetActive(true);
-        _isProgress = true;
-        Progress().Forget();
+        Progress(onAction).Forget();
     }
 
     public void Cancle()
     {
-        _cacledForce = true;
+        _cts.Cancel();
     }
 
     public CancellationTokenSource GetCTS() => _cts;
@@ -50,21 +49,23 @@ public class RadialProgress
         _speed = _curPercentValue / _duration;
         _cacledForce = false;
         _isProgress = false;
+        _cts = new CancellationTokenSource();
     }
 
-    private async UniTask Progress(CancellationToken cancellationToken = default(CancellationToken))
+    // onAction 은 버튼 프로세스용
+    private async UniTask Progress(Action onAction = null)
     {
+        _isProgress = true;
         while (true)
         {
             await UniTask.WaitForEndOfFrame(_coroutineRunner);
 
-            if (true == cancellationToken.IsCancellationRequested)
-                break;
-
-            if (true == _cacledForce)
+            if (true == _cts.IsCancellationRequested)
             {
+                Debug.Log("CancleProgress");
                 Initialized();
-                break;
+                SetActive(false);
+                return;
             }
 
             if (_curPercentValue > 0)
@@ -79,7 +80,7 @@ public class RadialProgress
                 break;
             }
         }
-
+        onAction();
         Initialized();
         SetActive(false);
     }

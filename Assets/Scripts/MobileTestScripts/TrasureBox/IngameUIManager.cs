@@ -130,7 +130,7 @@ public class IngameUIManager
     private async UniTask CreateUIThirdToThird()
     {
         InputSystem = await InstantiateRapidlyUpdateUI<IngameInputSystem>("Assets/Prefabs/IngameInputSystem.prefab");
-        InputSystem.OnHide();
+        //InputSystem.OnHide();
         test1 = await InstantiateRapidlyUpdateUI<UIBaseTest1>("Assets/Prefabs/UIBaseTest1.prefab");
         test1.OnHide();
         test2 = await InstantiateRapidlyUpdateUI<UIBaseTest2>("Assets/Prefabs/UIBaseTest2.prefab");

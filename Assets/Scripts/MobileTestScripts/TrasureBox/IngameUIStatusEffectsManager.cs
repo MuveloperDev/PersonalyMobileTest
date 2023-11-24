@@ -11,26 +11,23 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     [SerializeField] private GameObject _disableGroup;
 
     [Header("DATA INFORMATION")]
-    [SerializeField] private List<StatusEffectData> _serverEffectList;
-    [SerializeField] private List<IngameUIStatusEffect> _vaildEffects;
-    [SerializeField] private List<IngameUIStatusEffect> _inVaildEffects;
-    [SerializeField] private List<StatusEffectData> _waitingList;
+    [SerializeField] private List<StatusEffectData> _serverEffectList = new();
+    [SerializeField] private List<IngameUIStatusEffect> _vaildEffects = new();
+    [SerializeField] private List<IngameUIStatusEffect> _inVaildEffects = new();
+    [SerializeField] private List<StatusEffectData> _waitingList = new();
 
     [SerializeField] private const int MAX_PRINT_STATUS_EFFECT_CNT = 10;
 
 
     private void Awake()
     {
-        _serverEffectList = new List<StatusEffectData>();
-        _waitingList = new List<StatusEffectData>();
-        _vaildEffects = new List<IngameUIStatusEffect>();
-
-        var list = _disableGroup.GetComponentsInChildren<IngameUIStatusEffect>(true);
-        _inVaildEffects = list.ToList();
-
+        var IngameUIStatusEffectArray = _disableGroup.GetComponentsInChildren<IngameUIStatusEffect>(true);
+        _inVaildEffects = IngameUIStatusEffectArray.ToList();
     }
+
     private void Update()
     {
+        // 테스트 코드
         if (Input.GetKeyDown(KeyCode.Q))
         {
             //int Id = Random.Range(1, 15);
@@ -51,19 +48,20 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             _serverEffectList.Clear();
         }
         RefreshData();
-    }
-    int RandomId()
-    {
-        HashSet<int> validGroupIds = new HashSet<int>(_serverEffectList.Select(effect => effect.groupId));
-        int Id = Random.Range(1, 50);
 
-        if (true == validGroupIds.Contains(Id))
+        int RandomId()
         {
-            return RandomId();
-        }
-        else
-        {
-            return Id;
+            HashSet<int> validGroupIds = new HashSet<int>(_serverEffectList.Select(effect => effect.groupId));
+            int Id = Random.Range(1, 50);
+
+            if (true == validGroupIds.Contains(Id))
+            {
+                return RandomId();
+            }
+            else
+            {
+                return Id;
+            }
         }
     }
 
@@ -73,9 +71,11 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         // 서버에서 받아온다.
         // StatusEffectList 에서 그룹핑 아이디가 겹칠일이 있는가?
         // 즉, 그룹핑 아이디를 교체한 후 리스트를 보내주는가 아닌가
+
         // StatusEffectList 업데이트
         RefreshData();
     }
+
     // _serverEffectList가 업데이트 된 직후 호출
     void RefreshData()
     {
@@ -173,7 +173,6 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
                 continue;
             }
 
-
             // type을 비교해서 교체작업.
             // 근데 서버쪽에서 List에 중복된 그룹ID가 들어올수도 있는지 확인해야함.
             // 교체 type은 groupID 마다 동일한지도 체크해야함()
@@ -185,7 +184,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         }
     }
 
-    public void AddNewSatatusEffect(IngameUIStatusEffect argEffect, StatusEffectData argData)
+    private void AddNewSatatusEffect(IngameUIStatusEffect argEffect, StatusEffectData argData)
     {
         bool result = _inVaildEffects.Remove(argEffect);
         if (false == result)
@@ -202,7 +201,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     }
 
     // 이건 개별로 duration이 끝난다면 콜백
-    public void MoveInValidEffectsList(IngameUIStatusEffect argEffect)
+    private void MoveInValidEffectsList(IngameUIStatusEffect argEffect)
     {
         // 테스트 코드
         for (int i = 0; i < _serverEffectList.Count(); i++)
@@ -221,6 +220,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             _waitingList.RemoveAt(0);
             return;
         }
+
         // WatingList가 없다면.
         bool result = _vaildEffects.Remove(argEffect);
         if (false == result)

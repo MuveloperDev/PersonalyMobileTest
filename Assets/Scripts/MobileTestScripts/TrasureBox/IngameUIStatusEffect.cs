@@ -42,11 +42,6 @@ public class IngameUIStatusEffect : MonoBehaviour
         _radius.SetTime(data.duration);
     }
 
-    public int GetRemainningDuration()
-    {
-        // 남은 시간 반환
-        return data.duration;
-    }
     public void OnHide()
     {
         gameObject.SetActive(false);
@@ -55,6 +50,11 @@ public class IngameUIStatusEffect : MonoBehaviour
         Initialize();
     }
 
+    public int GetRemainningDuration()
+    {
+        // 남은 시간 반환
+        return _radius.GetTime();
+    }
     public int GetGroupId() => data.groupId;
     public StatusEffectData GetData() => data;
 
@@ -65,10 +65,7 @@ public class IngameUIStatusEffect : MonoBehaviour
         _radius.SetTime(data.duration);
     }
 
-    private void Initialize()
-    {
-        data.Init();
-    }
+    private void Initialize() => data.Init();
 }
 
 [Serializable]

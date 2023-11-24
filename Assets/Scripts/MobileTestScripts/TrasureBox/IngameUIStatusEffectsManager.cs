@@ -23,6 +23,8 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     {
         var IngameUIStatusEffectArray = _disableGroup.GetComponentsInChildren<IngameUIStatusEffect>(true);
         _inVaildEffects = IngameUIStatusEffectArray.ToList();
+        foreach (var statusEffect in _inVaildEffects)
+            statusEffect.endDurationCallback = MoveInValidEffectsList;
     }
 
     private void Update()
@@ -196,11 +198,10 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         _vaildEffects.Add(argEffect);
         argEffect.transform.SetParent(_layoutGroup.transform);
         argEffect.transform.SetAsFirstSibling();
-        argEffect.endDurationCallback = MoveInValidEffectsList;
         argEffect.OnShow(argData);
     }
 
-    // 이건 개별로 duration이 끝난다면 콜백
+    // 개별 상태의 duration이 끝난다면 콜백
     private void MoveInValidEffectsList(IngameUIStatusEffect argEffect)
     {
         // 테스트 코드

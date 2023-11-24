@@ -25,13 +25,11 @@ public class IngameUIStatusEffect : MonoBehaviour
 
     public void OnShow(StatusEffectData argData)
     {
-            Debug.Log("Show");
         gameObject.SetActive(true);
         SetData(argData);
         _timeText.text = argData.groupId.ToString();
         _radius.SetTime(data.duration);
         _radius.Interaction(() => {
-            Debug.Log("Hide");
             OnHide();
         });
     }

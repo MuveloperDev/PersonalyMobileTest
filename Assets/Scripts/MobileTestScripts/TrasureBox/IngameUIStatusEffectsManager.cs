@@ -6,15 +6,18 @@ using UnityEngine.UI;
 
 public class IngameUIStatusEffectsManager : MonoBehaviour
 {
+    [Header("DEPENDENCY")]
+    [SerializeField] private HorizontalLayoutGroup _layoutGroup;
+    [SerializeField] private GameObject _disableGroup;
+
+    [Header("DATA INFORMATION")]
     [SerializeField] private List<StatusEffectData> _serverEffectList;
     [SerializeField] private List<IngameUIStatusEffect> _vaildEffects;
     [SerializeField] private List<IngameUIStatusEffect> _inVaildEffects;
     [SerializeField] private List<StatusEffectData> _waitingList;
 
-    [SerializeField] private HorizontalLayoutGroup _layoutGroup;
-    [SerializeField] private GameObject _disableGroup;
     [SerializeField] private const int MAX_PRINT_STATUS_EFFECT_CNT = 10;
-    // 데이터 받을때 콜백으로 사용 예정.
+
 
     private void Awake()
     {
@@ -63,6 +66,8 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             return Id;
         }
     }
+
+    // 데이터 받을때 콜백으로 사용 예정.
     public void GetCurrentStatusEffect()
     {
         // 서버에서 받아온다.
@@ -121,7 +126,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         
         // 10개라면 이미 맥스 이떄는 Waiting에 보내야함.
 
-        if (10 > DisplayList.Count)
+        if (MAX_PRINT_STATUS_EFFECT_CNT > DisplayList.Count)
         {
             // 10개 보다 작다면 10개까지 채운다.
 

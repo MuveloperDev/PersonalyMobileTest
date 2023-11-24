@@ -46,24 +46,20 @@ public class ActionButton : MonoBehaviour
         ToggleForm // 토글 형태
     }
 
-    //public enum SkillRange
-    //{
-    //    StraightLine = 1,
-    //    FanShaped,
-    //    Circular_Radius_3,
-    //    Circular_Radius_4,
-    //    Circular_Radius_5,
-    //}
-
     [Header("DEPENDENCY")]
     [SerializeField] private IngameUIButtonBase _button;
     [SerializeField] private Image _radialImage;
-    [SerializeField] private RadialProgress _radialProgress;
+    [SerializeField] private IngameUIRadialProgress _radialProgress;
     [SerializeField] private IngameVirtualJoystickBase _joystick;
+    [SerializeField] private IngameUIAimComboActionButton _aimComboProcess;
+    [SerializeField] private IngameUICoolTime _coolTIme;
+    [SerializeField] private GameObject _coolTimeObject;
+    [SerializeField] private TextMeshProUGUI _textCoolTime;
 
-    #region SkillInfo
     [Header("STATE TYPES")]
     [SerializeField] private List<StateType> _types;
+
+    #region SkillInfo
     // 추후 구조체로 만들어서 사용 예정.
     [Header("SKILL INFOMATION")]
     // 매니저에서 테이블데이터를 캐싱 후 데이터를 넘겨 받을것 
@@ -133,19 +129,20 @@ public class ActionButton : MonoBehaviour
     #endregion
 
     #region [Button_Interaction_Handler]
-    public Action<PointerEventData> _onClickDownEvent;
-    public Action<PointerEventData> _onClickUpEvent;
+    public Action<PointerEventData> _onPointerDownEvent;
+    public Action<PointerEventData> _onPointerUpEvent;
     public Action<PointerEventData> _onBeginDragEvent;
     public Action<PointerEventData> _onDragEvent;
     public Action<PointerEventData> _onEndDragEvent;
     #endregion
-    private CancellationTokenSource _cts = new CancellationTokenSource();
 
-    enum InputType
+    public enum InputType
     {
-        NormalTouch,
+        NormalTouch_Aim,
+        NormalTouch_Immediately,
         TouchDownAndUp,
         DoubleTouch,
+        MultipleTouch,
         Swipe // 이건 미정.
     }
 
@@ -157,127 +154,155 @@ public class ActionButton : MonoBehaviour
         CoolTimeEndEvent,
 
     }
-    InputType currentInputType = InputType.TouchDownAndUp;
+#if UNITY_EDITOR
+    [SerializeField] private InputType _prevInputType;
+#endif
+
+    [SerializeField] private InputType _inputType;
     // 스킬 타입을 인자로 받는다.(매니저에서)
     // 스킬 타입에 대한 데이터를 인자로 받는다 (매니저 -> ActionButton).
     // 거기에 따른 타입 설정.
-    public void Initialize(List<StateType> argTypes)
+    void OnValidate()
     {
-        _types = argTypes;
-
-        foreach (var stateType in _types)
+        switch (_prevInputType)
         {
-            switch (stateType)
-            {
-                case StateType.RadialProgress:
-                    {
-                        if (null == _radialImage)
-                        {
-                            Debug.LogError($"{GetType()} radialImage is null");
-                            return;
-                        }
-                        _radialProgress = new RadialProgress(5f, this, _radialImage);
-                        break;
-                    }
-                case StateType.CoolTime:
-                    {
-                        break;
-                    }
-            }
+            case InputType.NormalTouch_Aim:
+                _coolTIme.Reset();
+                break;
+            case InputType.NormalTouch_Immediately:
+                _coolTIme.Reset();
+                break;
+            case InputType.TouchDownAndUp:
+                _coolTIme.Reset();
+                break;
+            case InputType.DoubleTouch:
+                break;
+            case InputType.MultipleTouch:
+                _aimComboProcess.Reset();
+                break;
         }
 
+        switch (_inputType)
+        {
+            case InputType.NormalTouch_Aim:
+                _coolTIme.RefreshData(1);
+                break;
+            case InputType.NormalTouch_Immediately:
+                _coolTIme.RefreshData(1);
+                break;
+            case InputType.TouchDownAndUp:
+                _coolTIme.RefreshData(20);
+                break;
+            case InputType.DoubleTouch:
+                break;
+            case InputType.MultipleTouch:
+                _aimComboProcess.RefreshData(3,3,20);
+                break;
+        }
+    }
+    public void Initialize(InputType argType)
+    {
+        _inputType = argType;
+
+#if UNITY_EDITOR
+        _prevInputType = _inputType;
+#endif
+
+        // 필요한 기능은 버튼의 터치 방식에 따라서 결정
+        _radialProgress = new IngameUIRadialProgress(5f, this, _radialImage);
+        _coolTIme = new IngameUICoolTime(20, _coolTimeObject, _textCoolTime);
+        _aimComboProcess = new IngameUIAimComboActionButton(_coolTIme, 3, 3, 20);
+
         AddLitener();
-        _startCoolTimeValue = 30;
-        //_button.SetUseProcessPressing(true);
     }
 
     public void SetType(List<StateType> argTypes) => _types = argTypes;
-    public IngameUIButtonBase GetButton() => _button;
 
-    // 터치 이벤트들은 추후 클래스로 전부 별도로 빠질 예정
+    public Vector2 GetJoystickVector2() => _joystick.GetVector2();
 
 #pragma warning disable CS1998
     private async UniTask AttackButtonEffect()
     {
         Debug.Log(" 어택 버튼 이펙트 !!!");
     }
-
     // 쿨타임
     #region COOLTIME
-    [SerializeField] private bool _isCoolTime;
-    [SerializeField] private int _startCoolTimeValue;
-    private async UniTask CoolTime(CancellationToken token = default(CancellationToken))
-    {
-        _isCoolTime = true;
-        int second = _startCoolTimeValue;
-        while (second > 0)
-        {
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
-            Debug.Log("Remaining: " + second + "s");
-            await UniTask.Delay(1000);
-            second--;
-        }
-        _isCoolTime = false;
-        Debug.Log("Countdown finished!");
-    }
     private async UniTask CoolTimeEndEffect()
     {
         Debug.Log(" 쿨타임 끝 이펙트 !!!");
     }
     #endregion
 
-    private async UniTask TouchHoldEvnet()
+    private async UniTask TouchHoldEvnet(PointerEventData eventData)
     {
         _radialProgress.Interaction(()=> { 
             _isIgonreUpEvent = true; 
-            _onClickUpEvent?.Invoke(null);
-            UpProcessBasedOnTouchType();
+            _onPointerUpEvent?.Invoke(eventData);
+            UpProcessBasedOnTouchType(eventData);
         });
     }
 
-    private void DownProcessBasedOnTouchType()
+    private void DownProcessBasedOnTouchType(PointerEventData eventData)
     {
-        switch (currentInputType)
+        switch (_inputType)
         {
-            case InputType.NormalTouch:
-                NormalTouchEffect();
+            case InputType.NormalTouch_Aim:
+                _joystick.OnShow(eventData);
+                break;
+            case InputType.NormalTouch_Immediately:
+                _onPointerUpEvent?.Invoke(eventData);
+                NormalTouchImmediatelyProcess();
                 break; 
             case InputType.TouchDownAndUp:
-                DownProcessOfTouchDownAndUp();
+                _joystick.OnShow(eventData);
+                DownProcessOfTouchDownAndUp(eventData);
                 break;
             case InputType.DoubleTouch: 
+                _joystick.OnShow(eventData);
+                break;
+            case InputType.MultipleTouch:
+                _joystick.OnShow(null);
+                _aimComboProcess.DownProcessCombo().Forget();
                 break;
         }
     }
-    private void UpProcessBasedOnTouchType()
+    private void UpProcessBasedOnTouchType(PointerEventData eventData)
     {
-        switch (currentInputType)
+        switch (_inputType)
         {
-            case InputType.NormalTouch:
+            case InputType.NormalTouch_Aim:
+                _joystick.OnHide();
+                NormalTouchImmediatelyProcess();
+                break;
+            case InputType.NormalTouch_Immediately:
                 break;
             case InputType.TouchDownAndUp:
+                _joystick.OnHide();
                 UpProcessOfTouchDownAndUp();
                 break;
             case InputType.DoubleTouch:
+                _joystick.OnHide();
+                break;
+            case InputType.MultipleTouch:
+                _joystick.OnHide();
+                _aimComboProcess.UpProcessCombo().Forget();
                 break;
         }
     }
 
 
-    private async void NormalTouchEffect()
+    private async void NormalTouchImmediatelyProcess()
     {
         AttackButtonEffect().Forget();  // 이펙트를 따로 돌린다.
-        await CoolTime();
+        await _coolTIme.Interaction();
         CoolTimeEndEffect().Forget();
     }
 
+
     [SerializeField] private bool _isIgonreUpEvent;
-    private async void DownProcessOfTouchDownAndUp()
+    private async void DownProcessOfTouchDownAndUp(PointerEventData eventData)
     {
-        TouchHoldEvnet().Forget();
+        TouchHoldEvnet(eventData).Forget();
     }
     private async void UpProcessOfTouchDownAndUp()
     {
@@ -286,66 +311,67 @@ public class ActionButton : MonoBehaviour
         {
             _radialProgress.Cancle();
         }
-        await CoolTime();
+        await _coolTIme.Interaction();
         CoolTimeEndEffect().Forget();
     }
 
 
-    private void OnClickUpEvent(PointerEventData eventData)
+    private void OnPointerUpEvent(PointerEventData eventData)
     {
-        if (true == _isCoolTime)
+        if (true == _coolTIme.IsCoolTime())
             return;
 
         if (false == _isIgonreUpEvent)
         { 
-            _onClickUpEvent?.Invoke(eventData);
-            UpProcessBasedOnTouchType();
+            _onPointerUpEvent?.Invoke(eventData);
+            UpProcessBasedOnTouchType(eventData);
         }
         else _isIgonreUpEvent = false;
 
     }
 
-    private void OnClickDownEvent(PointerEventData eventData)
+    private void OnPointerDownEvent(PointerEventData eventData)
     {
-        if (true == _isCoolTime)
+        if (true == _coolTIme.IsCoolTime())
             return;
 
-        _onClickDownEvent?.Invoke(eventData);
-        DownProcessBasedOnTouchType();
+        _onPointerDownEvent?.Invoke(eventData);
+        DownProcessBasedOnTouchType(eventData);
     }
 
     private void OnDragEvent(PointerEventData eventData)
     {
-        if (true == _isCoolTime)
+        if (true == _coolTIme.IsCoolTime())
             return;
 
+        _joystick.HandleJoystickInput(eventData);
         _onDragEvent?.Invoke(eventData);
     }
 
     private void OnBeginDragEvent(PointerEventData eventData)
     {
-        if (true == _isCoolTime)
+        if (true == _coolTIme.IsCoolTime())
             return;
 
         _onDragEvent?.Invoke(eventData);
     }
     private void OnEndDragEvent(PointerEventData eventData)
     {
-        if (true == _isCoolTime)
+        if (true == _coolTIme.IsCoolTime())
             return;
 
         _onBeginDragEvent?.Invoke(eventData);
     }
     private void AddLitener()
     {
-        _button.OnClickUpRemoveLitener(OnClickUpEvent);
-        _button.OnClickDownRemoveLitener(OnClickDownEvent);
+        _button.OnClickUpRemoveLitener(OnPointerUpEvent);
+        _button.OnClickDownRemoveLitener(OnPointerDownEvent);
         _button.OnDragRemoveLitener(OnDragEvent);
         _button.OnBeginDragRemoveLitener(OnBeginDragEvent);
         _button.OnEndDragRemoveLitener(OnEndDragEvent);
 
-        _button.OnClickUpAddLitener(OnClickUpEvent);
-        _button.OnClickDownAddLitener(OnClickDownEvent);
+        _button.OnClickUpAddLitener(OnPointerUpEvent);
+        _button.OnClickDownAddLitener(OnPointerDownEvent);
         _button.OnDragAddLitener(OnDragEvent);
         _button.OnBeginDragAddLitener(OnBeginDragEvent);
         _button.OnEndDragAddLitener(OnEndDragEvent);

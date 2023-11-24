@@ -1,17 +1,13 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
 
 [Serializable]
-public class RadialProgress
+public class IngameUIRadialProgress
 {
     [SerializeField] private Image _radiusImg;
-    [SerializeField] private bool _cacledForce;
     [SerializeField] private bool _isProgress;
     [SerializeField] private float _curPercentValue;
     [SerializeField] private float _duration;
@@ -19,7 +15,7 @@ public class RadialProgress
     [SerializeField] private MonoBehaviour _coroutineRunner;
     [SerializeField] private CancellationTokenSource _cts;
 
-    public RadialProgress(float argDuration, MonoBehaviour argCoroutineRunner, Image argRadiusImg)
+    public IngameUIRadialProgress(float argDuration, MonoBehaviour argCoroutineRunner, Image argRadiusImg)
     {
         _duration = argDuration;
         _coroutineRunner = argCoroutineRunner;
@@ -29,8 +25,16 @@ public class RadialProgress
 
     public void Interaction(Action onAction = null)
     {
-        SetActive(true);
+        _radiusImg.gameObject.SetActive(true);
         Progress(onAction).Forget();
+    }
+
+    public void Reset()
+    {
+        if (true == _isProgress)
+        {
+            _cts.Cancel();
+        }
     }
 
     public void Cancle()
@@ -40,14 +44,18 @@ public class RadialProgress
 
     public CancellationTokenSource GetCTS() => _cts;
     public bool GetProgress() => _isProgress;
-    public void SetTime(float argTime) => _duration = argTime;
+    public void SetTime(float argTime)
+    {
+        _duration = argTime;
+        Initialized();
+    }
+    public int GetTime() => (int)Math.Ceiling( _curPercentValue / (_speed * Time.deltaTime));
     public void SetActive(bool isActive) => _radiusImg.gameObject.SetActive(isActive);
 
     private void Initialized()
     {
         _curPercentValue = 100;
         _speed = _curPercentValue / _duration;
-        _cacledForce = false;
         _isProgress = false;
         _cts = new CancellationTokenSource();
     }
@@ -60,7 +68,7 @@ public class RadialProgress
         {
             await UniTask.WaitForEndOfFrame(_coroutineRunner);
 
-            if (true == _cts.IsCancellationRequested)
+            if (true == _cts.Token.IsCancellationRequested)
             {
                 Debug.Log("CancleProgress");
                 Initialized();
@@ -80,8 +88,8 @@ public class RadialProgress
                 break;
             }
         }
-        onAction();
         Initialized();
-        SetActive(false);
+        _radiusImg.gameObject.SetActive(false);
+        onAction();
     }
 }

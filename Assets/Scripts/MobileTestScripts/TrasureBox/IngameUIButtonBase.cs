@@ -21,7 +21,7 @@ public class IngameUIButtonBase : IngameUIEventHandler
 
     [Header("DEPENDENCY INFORMATION")]
     [SerializeField] private Button button;
-    [SerializeField] private IngameDragAndDropButton _dragAndDropDestBtn;
+    [SerializeField] private IngameUIDragAndDropDestination _dragAndDropDestBtn;
     [SerializeField] private RectTransform _dragAndDropDestBtnRect;
     [SerializeField] private Image _dragGhostImage;
 
@@ -34,7 +34,10 @@ public class IngameUIButtonBase : IngameUIEventHandler
         button = GetComponent<Button>();
         // 타겟 버튼은 나중에 매니저급에서 캐싱해올것. (테스트용)
         _mode = InGameButtonMode.None;
-        SetDragAndDropDestButton(FindObjectOfType<IngameDragAndDropButton>());
+        if (_mode == InGameButtonMode.DragAndDrop)
+        {
+            SetDragAndDropDestButton(FindObjectOfType<IngameUIDragAndDropDestination>());
+        }
     }
 
     
@@ -60,7 +63,7 @@ public class IngameUIButtonBase : IngameUIEventHandler
 
     public void SetMode(InGameButtonMode argMode) => _mode = argMode;
 
-    public void SetDragAndDropDestButton(IngameDragAndDropButton argCancleBtn)
+    public void SetDragAndDropDestButton(IngameUIDragAndDropDestination argCancleBtn)
     { 
         // 드래그앤드랍 사용시 필수적으로 호출해야하는 함수.
         _dragAndDropDestBtn = argCancleBtn;

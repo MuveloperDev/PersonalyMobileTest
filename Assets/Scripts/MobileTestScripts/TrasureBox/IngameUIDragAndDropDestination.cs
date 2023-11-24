@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class IngameDragAndDropButton : MonoBehaviour
+public class IngameUIDragAndDropDestination : MonoBehaviour
 {
     private Action _onPointerEnter;
     public void OnPointerEnterAddLitener(Action argEvent) => _onPointerEnter += argEvent;

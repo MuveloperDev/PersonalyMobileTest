@@ -14,7 +14,6 @@ public class IngameUIEventHandler :MonoBehaviour , IPointerDownHandler, IPointer
     protected Action<PointerEventData> _onBeginDragEvent;
     protected Action<PointerEventData> _onDragEvent;
     protected Action<PointerEventData> _onEndDragEvent;
-    protected Action _ProcessPressingInputAction;
 
     public void OnClickDownAddLitener(Action<PointerEventData> argEvent) => _onClickDownEvent += argEvent;
     public void OnClickDownRemoveLitener(Action<PointerEventData> argEvent) => _onClickDownEvent -= argEvent;
@@ -31,20 +30,11 @@ public class IngameUIEventHandler :MonoBehaviour , IPointerDownHandler, IPointer
     public void OnEndDragAddLitener(Action<PointerEventData> argEvent) => _onEndDragEvent += argEvent;
     public void OnEndDragRemoveLitener(Action<PointerEventData> argEvent) => _onEndDragEvent -= argEvent;
 
-    public void OnProcessingPressInputAddLitener(Action argEvent) => _ProcessPressingInputAction += argEvent;
-    public void OnProcessingPressInputRemoveLitener(Action argEvent) => _ProcessPressingInputAction -= argEvent;
-
-
-    [SerializeField] protected CancellationTokenSource cts;
-
     [SerializeField] public bool _isArriveAtTheDest = false;
     [SerializeField] public bool _isPressed = false;
-    [SerializeField] public bool _useProcessPressing = false;
 
     protected Vector2 _dragPos;
     public Vector2 dragPos { get { return _dragPos; } private set { } }
-
-    public void SetUseProcessPressing(bool value) => _useProcessPressing = value;
 
 #pragma warning disable CS1998
     public async virtual void OnPointerDown(PointerEventData eventData)
@@ -55,9 +45,6 @@ public class IngameUIEventHandler :MonoBehaviour , IPointerDownHandler, IPointer
             _isArriveAtTheDest = false;
 
         _onClickDownEvent?.Invoke(eventData);
-
-        if (true == _useProcessPressing)
-            ProcessPressInput().Forget();
     }
 
     public async virtual void OnPointerUp(PointerEventData eventData)
@@ -82,24 +69,5 @@ public class IngameUIEventHandler :MonoBehaviour , IPointerDownHandler, IPointer
     public async virtual void OnEndDrag(PointerEventData eventData)
     {
         _onEndDragEvent?.Invoke(eventData);
-    }
-
-    public async UniTask ProcessPressInput(CancellationToken cancellationToken = default(CancellationToken))
-    {
-        while (true)
-        {
-            await UniTask.Yield();
-
-            if (cancellationToken.IsCancellationRequested)
-                break;
-
-            if (false == _isPressed)
-                break;
-
-            if (_ProcessPressingInputAction == null)
-                break;
-
-            _ProcessPressingInputAction?.Invoke();
-        }
     }
 }

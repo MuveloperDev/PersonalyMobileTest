@@ -23,9 +23,7 @@ public class ActionButtonManager : MonoBehaviour
         for (int i = 0; i < _actionBtnList.Count; i++)
         {
             _actionBtnDic.Add((ActionButtons)i, _actionBtnList[i]);
-            List <ActionButton.StateType> stateTypes = new List <ActionButton.StateType>();
-            stateTypes.Add(StateType.RadialProgress);
-            _actionBtnList[i].Initialize(stateTypes);
+            _actionBtnList[i].Initialize(InputType.DoubleTouch);
         }
         
     }

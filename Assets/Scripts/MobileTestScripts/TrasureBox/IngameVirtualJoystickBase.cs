@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,12 +13,15 @@ public class IngameVirtualJoystickBase : MonoBehaviour
     [SerializeField] protected RectTransform _rectTransform;
 
     [Header("INPUT VECTOR")]
-    [SerializeField] protected Vector2 inputVector;
-    [SerializeField] protected Vector2 inputDir;
+    [SerializeField] protected Vector2 _inputVector;
+    [SerializeField] protected Vector2 _inputDir;
 
-    public float GetHorizontal() => inputVector.x;
+    [Header("SETTINGS")]
+    [SerializeField] protected float MovBtnDeadZoneRange = 0.9f;
 
-    public float GetVertical() => inputVector.y;
+    public float GetHorizontal() => _inputVector.x;
+    public float GetVertical() => _inputVector.y;
+    public Vector2 GetVector2() => _inputVector;
 
     public virtual void OnShow(PointerEventData eventData)
     {
@@ -25,34 +29,50 @@ public class IngameVirtualJoystickBase : MonoBehaviour
             _rectTransform = GetComponent<RectTransform>();
 
         gameObject.SetActive(true);
-        Vector3 pos;
-        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_rectTransform, eventData.position, eventData.pressEventCamera, out pos))
-        {
-            _rectTransform.position = pos;
-        }
     }
 
     public virtual void OnHide()
     {
-        _rectTransform.position = Vector3.zero;
-        inputVector = Vector2.zero;
+        _rectTransform.anchoredPosition = Vector2.zero;
+        joystickHandle.anchoredPosition = Vector2.zero;
+        _inputVector = Vector2.zero;
         gameObject.SetActive(false);
+    }
+
+    public void MoveJoystickPos(Vector2 argDestPos)
+    {
+        joystickBackground.position = argDestPos;
+    }
+
+    public void ResetJoystickPos(Vector2 argOffsetPos)
+    {
+        joystickBackground.anchoredPosition = argOffsetPos;
     }
 
     public virtual void HandleJoystickInput(PointerEventData eventData)
     {
+        MovBtnDeadZoneRange = 0.5f;
         Vector2 pos;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(joystickBackground, eventData.position, eventData.pressEventCamera, out pos))
         {
             pos.x = (pos.x / joystickBackground.sizeDelta.x) + 0.5f;
             pos.y = (pos.y / joystickBackground.sizeDelta.y) + 0.5f;
 
-            inputVector = new Vector2(pos.x * 2 - 1, pos.y * 2 - 1);
-            inputVector = (inputVector.magnitude > 1.0f) ? inputVector.normalized : inputVector;
+            _inputVector = new Vector2(pos.x * 2 - 1, pos.y * 2 - 1);
+            _inputVector = (_inputVector.magnitude > 1.0f) ? _inputVector.normalized : _inputVector;
 
-            joystickHandle.anchoredPosition = new Vector2(inputVector.x * (joystickBackground.sizeDelta.x / 3), inputVector.y * (joystickBackground.sizeDelta.y / 3));
+
+            joystickHandle.anchoredPosition = new Vector2(_inputVector.x * (joystickBackground.sizeDelta.x / 3), _inputVector.y * (joystickBackground.sizeDelta.y / 3));
+
+            float x = _inputVector.x;
+            float y = _inputVector.y;
+            bool onDeadZone = x <= MovBtnDeadZoneRange && y <= MovBtnDeadZoneRange && x >= -MovBtnDeadZoneRange && y >= -MovBtnDeadZoneRange;
+            if (true == onDeadZone)
+            {
+                _inputVector = Vector2.zero;
+            }
+
         }
-        inputDir = eventData.position - joystickBackground.anchoredPosition;
-        //Debug.Log($"inputDir.x :{GetHorizontal()} / inputDir.y : {GetVertical()}");
+        _inputDir = eventData.position - joystickBackground.anchoredPosition;
     }
 }

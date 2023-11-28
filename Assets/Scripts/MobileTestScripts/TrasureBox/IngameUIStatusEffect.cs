@@ -27,6 +27,7 @@ public partial class IngameUIStatusEffect : IngameUIEventHandler
     [SerializeField] private TextMeshProUGUI _timeText;
     [SerializeField] private TextMeshProUGUI _stackText;
     [SerializeField] private IngameUIStatusEffect _statusEffect;
+    [SerializeField] private RectTransform _radialEffectRect;
 
     [Header("INFORMATION")]
     [SerializeField] private IngameUIStatusEffectType _type;
@@ -40,7 +41,7 @@ public partial class IngameUIStatusEffect : IngameUIEventHandler
 
     public void Initialize()
     {
-        _radius = new IngameUIRadialProgress(0, this, _dimd);
+        _radius = new IngameUIRadialProgress(0, this, _dimd, _radialEffectRect);
     }
 
     public void OnShow(StatusEffectData argData)

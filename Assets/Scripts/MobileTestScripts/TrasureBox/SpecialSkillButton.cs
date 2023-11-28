@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,6 +29,11 @@ public class SpecialSkillButton : SkillActionButtonBase
     public override void DecreaseCoolTime()
     {
         base.DecreaseCoolTime();
+    }
+
+    public override async UniTask AttackButtonEffect()
+    {
+        Debug.Log($"{GetType()} 액션 버튼 이펙트 !");
     }
     #endregion
 

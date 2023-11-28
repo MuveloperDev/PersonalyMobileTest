@@ -653,19 +653,24 @@ MonoBehaviour:
   _radialImageSkill: {fileID: 8180013831925022150}
   _radialProgressSkill:
     _radiusImg: {fileID: 0}
+    _effectTransform: {fileID: 0}
+    _coroutineRunner: {fileID: 0}
     _isProgress: 0
+    _isUpdateEffectObj: 0
     _curPercentValue: 0
     _duration: 0
     _speed: 0
-    _coroutineRunner: {fileID: 0}
+  _radialEffectRect: {fileID: 5862168039968118898}
   _radialImageStackOrCombo: {fileID: 3099111017355746591}
   _radialProgressStackOrCombo:
     _radiusImg: {fileID: 0}
+    _effectTransform: {fileID: 0}
+    _coroutineRunner: {fileID: 0}
     _isProgress: 0
+    _isUpdateEffectObj: 0
     _curPercentValue: 0
     _duration: 0
     _speed: 0
-    _coroutineRunner: {fileID: 0}
   _stackComboText: {fileID: 4804607400789754979}
   _joystick: {fileID: 4654871766397483080}
   _aimComboProcess:
@@ -804,19 +809,24 @@ MonoBehaviour:
   _radialImageSkill: {fileID: 6796516259264786516}
   _radialProgressSkill:
     _radiusImg: {fileID: 0}
+    _effectTransform: {fileID: 0}
+    _coroutineRunner: {fileID: 0}
     _isProgress: 0
+    _isUpdateEffectObj: 0
     _curPercentValue: 0
     _duration: 0
     _speed: 0
-    _coroutineRunner: {fileID: 0}
+  _radialEffectRect: {fileID: 0}
   _radialImageStackOrCombo: {fileID: 1719977046701939480}
   _radialProgressStackOrCombo:
     _radiusImg: {fileID: 0}
+    _effectTransform: {fileID: 0}
+    _coroutineRunner: {fileID: 0}
     _isProgress: 0
+    _isUpdateEffectObj: 0
     _curPercentValue: 0
     _duration: 0
     _speed: 0
-    _coroutineRunner: {fileID: 0}
   _stackComboText: {fileID: 7021674230514332791}
   _joystick: {fileID: 5001506522860294648}
   _aimComboProcess:
@@ -2378,19 +2388,24 @@ MonoBehaviour:
   _radialImageSkill: {fileID: 7922491185879389391}
   _radialProgressSkill:
     _radiusImg: {fileID: 0}
+    _effectTransform: {fileID: 0}
+    _coroutineRunner: {fileID: 0}
     _isProgress: 0
+    _isUpdateEffectObj: 0
     _curPercentValue: 0
     _duration: 0
     _speed: 0
-    _coroutineRunner: {fileID: 0}
+  _radialEffectRect: {fileID: 0}
   _radialImageStackOrCombo: {fileID: 3146791075070550669}
   _radialProgressStackOrCombo:
     _radiusImg: {fileID: 0}
+    _effectTransform: {fileID: 0}
+    _coroutineRunner: {fileID: 0}
     _isProgress: 0
+    _isUpdateEffectObj: 0
     _curPercentValue: 0
     _duration: 0
     _speed: 0
-    _coroutineRunner: {fileID: 0}
   _stackComboText: {fileID: 8640144603047957078}
   _joystick: {fileID: 5774460668395944116}
   _aimComboProcess:
@@ -2625,6 +2640,82 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: dbdf7ce40c59d6f48817604f236e70eb, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4475329260363925927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5862168039968118898}
+  - component: {fileID: 1227670552447632939}
+  - component: {fileID: 7948964562785943959}
+  m_Layer: 5
+  m_Name: Image (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5862168039968118898
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4475329260363925927}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5127835149492388250}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 86.985085}
+  m_SizeDelta: {x: 61.3535, y: 22.6598}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1227670552447632939
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4475329260363925927}
+  m_CullTransparentMesh: 1
+--- !u!114 &7948964562785943959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4475329260363925927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3792,7 +3883,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5127835149492388250
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3804,7 +3895,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5862168039968118898}
   m_Father: {fileID: 4348993075014466038}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

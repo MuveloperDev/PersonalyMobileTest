@@ -104,6 +104,7 @@ public class SkillActionButtonBase : MonoBehaviour
     [Space]
     [SerializeField] protected Image _radialImageSkill;
     [SerializeField] protected IngameUIRadialProgress _radialProgressSkill;
+    [SerializeField] private RectTransform _radialEffectRect;
     [Space]
     [SerializeField] protected Image _radialImageStackOrCombo;
     [SerializeField] protected IngameUIRadialProgress _radialProgressStackOrCombo;
@@ -127,9 +128,6 @@ public class SkillActionButtonBase : MonoBehaviour
 
 
     [SerializeField] private bool _isIgonreUpEvent;
-
-    //[SerializeField] protected IngameUIToolTipBox _toolTipBox;
-    //[SerializeField] private CancellationTokenSource _cts = new();
 
     #region [Button_Interaction_Handler]
     public Action<PointerEventData> _onPointerDownEvent;
@@ -200,13 +198,14 @@ public class SkillActionButtonBase : MonoBehaviour
     #endregion
 
 #pragma warning disable CS1998
-    private async UniTask AttackButtonEffect()
+    public virtual async UniTask AttackButtonEffect()
     {
-        Debug.Log(" 어택 버튼 이펙트 !!!");
+        // 어택버튼 이벤트는 공통인가?
     }
-    // 쿨타임
+
     private async UniTask CoolTimeEndEffect()
     {
+        // 쿨타임 끝 이벤트는 공통인가?
         Debug.Log(" 쿨타임 끝 이펙트 !!!");
     }
 
@@ -273,7 +272,7 @@ public class SkillActionButtonBase : MonoBehaviour
                 break;
             case InputType.DragReleaseTouch:
                 // 필요한 기능은 버튼의 터치 방식에 따라서 결정
-                _radialProgressSkill = new IngameUIRadialProgress(20, this, _radialImageSkill);
+                _radialProgressSkill = new IngameUIRadialProgress(20, this, _radialImageSkill, _radialEffectRect);
                 _coolTime = new IngameUICoolTime(20, _dimd, _textCoolTime);
                 //_aimComboProcess = new IngameUIAimComboActionButton(_coolTime, 3, 3, 20);
                 break;

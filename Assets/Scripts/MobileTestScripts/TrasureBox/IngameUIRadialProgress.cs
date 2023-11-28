@@ -1,25 +1,35 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 [Serializable]
 public class IngameUIRadialProgress
 {
+    [Header("DEPENDENCY")]
     [SerializeField] private Image _radiusImg;
-    [SerializeField] private bool _isProgress;
-    [SerializeField] private float _curPercentValue;
-    [SerializeField] private float _duration;
-    [SerializeField] private float _speed;
+    [SerializeField] private RectTransform _effectTransform;
     [SerializeField] private MonoBehaviour _coroutineRunner;
     [SerializeField] private CancellationTokenSource _cts;
 
-    public IngameUIRadialProgress(float argDuration, MonoBehaviour argCoroutineRunner, Image argRadiusImg)
+    [Header("INFORMATION")]
+    [SerializeField] private bool _isProgress;
+    [SerializeField] private bool _isUpdateEffectObj;
+    [SerializeField] private float _curPercentValue;
+    [SerializeField] private float _duration;
+    [SerializeField] private float _speed;
+
+
+
+    public IngameUIRadialProgress(float argDuration, MonoBehaviour argCoroutineRunner,
+        Image argRadiusImg, RectTransform argEffectTransform)
     {
         _duration = argDuration;
         _coroutineRunner = argCoroutineRunner;
         _radiusImg = argRadiusImg;
+        _effectTransform = argEffectTransform;
         Initialized();
     }
 
@@ -75,6 +85,10 @@ public class IngameUIRadialProgress
                 SetActive(false);
                 return;
             }
+            if (_curPercentValue <= 0)
+            {
+                break;
+            }
 
             if (_curPercentValue > 0)
             {
@@ -83,10 +97,20 @@ public class IngameUIRadialProgress
 
             _radiusImg.fillAmount = _curPercentValue / 100;
 
-            if (_curPercentValue <= 0)
+            // 이펙트 원을 그리며 따라가는 로직
+            if (true == _isUpdateEffectObj)
             {
-                break;
+                float adjust = -15f;
+                float imageWidth = _radiusImg.rectTransform.rect.width + adjust;
+                float imageHeight = _radiusImg.rectTransform.rect.height + adjust;
+                float radian = Mathf.PI - _radiusImg.fillAmount * Mathf.PI * 2;
+                float x = imageWidth / 2 * Mathf.Sin(radian);
+                float y = imageHeight / 2 * -Mathf.Cos(radian);
+
+                _effectTransform.localPosition = new Vector3(x, y, _effectTransform.localPosition.z);
+                _effectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * radian);
             }
+
         }
         Initialized();
         _radiusImg.gameObject.SetActive(false);

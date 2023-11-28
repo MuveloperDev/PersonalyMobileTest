@@ -104,8 +104,8 @@ public class IngameUIManager
         foreach (IngameCanvasType canvasType in Enum.GetValues(typeof(IngameCanvasType)))
         {
             var canvas = await InstantiateAndInitializeCanvas(canvasType, root.transform);
-            SafeAreaFitter safeArea = await InstantiateAndInitializeSafeArea(canvas.transform);
-            _canvasDic.Add(canvasType, safeArea.transform);
+            //SafeAreaFitter safeArea = await InstantiateAndInitializeSafeArea(canvas.transform);
+            _canvasDic.Add(canvasType, canvas.transform);
             createdUIElements.Add(canvas.gameObject);
         }
     }

@@ -90,6 +90,6 @@ public class IngameUIRadialProgress
         }
         Initialized();
         _radiusImg.gameObject.SetActive(false);
-        onAction();
+        onAction?.Invoke();
     }
 }

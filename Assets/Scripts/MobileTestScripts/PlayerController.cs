@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
         var buttonDic = _buttonManager.GetBtnDic();
 
         //buttonDic[ActionButtonManager.ActionButtons.NormalAttack].onAction = ()=> { };
-        buttonDic[ActionButtonManager.ActionButtons.NormalAttack]._onPointerUpEvent += (eventData) => { ActionAnim(AnimState.IsJump); };
+        buttonDic[ActionButtonManager.ActionButtons.SpecialSkillButton]._onPointerUpEvent += (eventData) => { ActionAnim(AnimState.IsJump); };
 
         _isInitialized = true;
     }

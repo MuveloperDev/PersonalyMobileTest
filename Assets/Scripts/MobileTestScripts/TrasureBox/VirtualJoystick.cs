@@ -15,7 +15,7 @@ public class VirtualJoystick : IngameVirtualJoystickBase, IBeginDragHandler, IEn
             _button.OnClickDownAddLitener(DownEvent);
             _button.OnClickUpAddLitener(UpEvent);
         }
-        _offset = new Vector2(342, 302);
+        _offset = new Vector2(joystickBackground.anchoredPosition.x, joystickBackground.anchoredPosition.y);
     }
     public override void OnShow(PointerEventData eventData)
     {

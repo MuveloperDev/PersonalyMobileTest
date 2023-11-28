@@ -2,20 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static ActionButton;
+using static SkillActionButtonBase;
 
 public class ActionButtonManager : MonoBehaviour
 {
     public enum ActionButtons
     {
-        NormalAttack = 0,
-        Skill1,
-        Skill2,
-        Skill3
+        BasicSkillButton = 0,
+        SpecialSkillButton,
+        UltimateSkillButton,
     }
-    [SerializeField] private List<ActionButton> _actionBtnList;
+    [SerializeField] private List<SkillActionButtonBase> _actionBtnList;
 
-    private Dictionary<ActionButtons, ActionButton> _actionBtnDic;
+    private Dictionary<ActionButtons, SkillActionButtonBase> _actionBtnDic;
     // Start is called before the first frame update
     void Awake()
     {
@@ -23,11 +22,11 @@ public class ActionButtonManager : MonoBehaviour
         for (int i = 0; i < _actionBtnList.Count; i++)
         {
             _actionBtnDic.Add((ActionButtons)i, _actionBtnList[i]);
-            _actionBtnList[i].Initialize(InputType.DoubleTouch);
+            //_actionBtnList[i].Initialize(InputType.DoubleTouch);
         }
         
     }
 
-    public Dictionary<ActionButtons, ActionButton> GetBtnDic() => _actionBtnDic;
+    public Dictionary<ActionButtons, SkillActionButtonBase> GetBtnDic() => _actionBtnDic;
     
 }

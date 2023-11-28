@@ -3,12 +3,13 @@ using System;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class IngameUICoolTime
 {
     [Header("DPENDENCY")]
-    [SerializeField] private GameObject _coolTimeRootObject;
+    [SerializeField] private Image _coolTimeRootObject;
     [SerializeField] private TextMeshProUGUI _textTime;
 
     [Header("COOLTIME INFORMATION")]
@@ -17,7 +18,7 @@ public class IngameUICoolTime
     [SerializeField] private int _curCoolTimeValue;
     [Header("TOKEN")]
     [SerializeField] private CancellationTokenSource _cts;
-    public IngameUICoolTime(int argMaxCoolTimeValue, GameObject _argCoolTimeObj = null, TextMeshProUGUI _argCoolTimeText = null)
+    public IngameUICoolTime(int argMaxCoolTimeValue, Image _argCoolTimeObj = null, TextMeshProUGUI _argCoolTimeText = null)
     {
         _maxCoolTimeValue= argMaxCoolTimeValue;
         if (null != _argCoolTimeObj)
@@ -33,7 +34,8 @@ public class IngameUICoolTime
 
     public async UniTask Interaction(Action onAction = null)
     {
-        _coolTimeRootObject.SetActive(true);
+        _coolTimeRootObject.gameObject.SetActive(true);
+        _textTime.gameObject.SetActive(true);
         await Process();
     }
 
@@ -55,7 +57,8 @@ public class IngameUICoolTime
         _curCoolTimeValue = _maxCoolTimeValue;
         _isCoolTime= false;
         _cts = new CancellationTokenSource();
-        _coolTimeRootObject.SetActive(false);
+        _coolTimeRootObject.gameObject.SetActive(false);
+        _textTime.gameObject.SetActive(false);
     }
 
     public void RefreshData(int argMaxCoolTimeValue)

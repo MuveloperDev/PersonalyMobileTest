@@ -14,21 +14,26 @@ public class IngameVirtualJoystickBase : MonoBehaviour
 
     [Header("INPUT VECTOR")]
     [SerializeField] protected Vector2 _inputVector;
+    [SerializeField] protected Vector2 _correctedInputVector;
     [SerializeField] protected Vector2 _inputDir;
 
     [Header("SETTINGS")]
-    [SerializeField] protected float MovBtnDeadZoneRange = 0.9f;
+    [SerializeField] protected float MovBtnDeadZoneRange = 0f;
 
     public float GetHorizontal() => _inputVector.x;
     public float GetVertical() => _inputVector.y;
     public Vector2 GetVector2() => _inputVector;
+    public Vector2 GetCorrectedDeadZoneVector2() => _correctedInputVector;
 
     public virtual void OnShow(PointerEventData eventData)
     {
         if (null == _rectTransform)
             _rectTransform = GetComponent<RectTransform>();
 
+        _rectTransform.position = eventData.position;
+
         gameObject.SetActive(true);
+        MovBtnDeadZoneRange = 0.5f;
     }
 
     public virtual void OnHide()
@@ -71,8 +76,19 @@ public class IngameVirtualJoystickBase : MonoBehaviour
             {
                 _inputVector = Vector2.zero;
             }
+            else
+            {
+                _correctedInputVector = CorrectInputVector(_inputVector, MovBtnDeadZoneRange);
+            }
 
         }
         _inputDir = eventData.position - joystickBackground.anchoredPosition;
+    }
+
+    private Vector2 CorrectInputVector(Vector2 inputVector, float deadZone)
+    {
+        float correctedX = (inputVector.x - deadZone) / (1 - deadZone);
+        float correctedY = (inputVector.y - deadZone) / (1 - deadZone);
+        return new Vector2(Mathf.Clamp(correctedX, 0, 1), Mathf.Clamp(correctedY, 0, 1));
     }
 }

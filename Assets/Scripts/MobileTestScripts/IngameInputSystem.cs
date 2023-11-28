@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using static HandedManager;
+using static IngameUIInputSystemHandedManager;
 
 public class IngameInputSystem : IngameUIBase
 {
@@ -14,19 +14,20 @@ public class IngameInputSystem : IngameUIBase
 
     [SerializeField] private ActionButtonManager _actionButtonManager;
     [SerializeField] private VirtualJoystick _joystick;
-    [SerializeField] private HandedManager _handedManager;
+    [SerializeField] private IngameUIInputSystemHandedManager _handedManager;
 
     private void Awake()
     {
         var _joystickRect = _joystick.GetComponent<RectTransform>();
         var _actionButtonManagerRect = _actionButtonManager.GetComponent<RectTransform>();
         var rects = GetComponentsInChildren<RectTransform>();
-        _handedManager = new HandedManager(rects.ToList<RectTransform>());
+        _handedManager = new IngameUIInputSystemHandedManager(rects.ToList<RectTransform>());
+        gameObject.AddComponent<SafeAreaFitter>();
 
     }
     private void OnValidate()
     {
-        if (HandedManager.HandedType.Left == _handedManager.GetHandedType())
+        if (IngameUIInputSystemHandedManager.HandedType.Left == _handedManager.GetHandedType())
         {
             _handedManager.SetHanded(HandedType.Left);
         }
@@ -50,33 +51,27 @@ public class IngameInputSystem : IngameUIBase
     public VirtualJoystick GetJoystick() => _joystick;
 }
 
+
 [Serializable]
-struct HandedTypeStruct
-{
-    public Vector2 joystickRootPosition;
-    public Vector2 actionButtonsPosition;
-}
-[Serializable]
-class HandedManager
+class IngameUIInputSystemHandedManager
 {
     public enum HandedType
     {
-        None,
         Left,
         Right
     }
 
     [Header("HANDED TYPE")]
-    [SerializeField] private HandedType _handedType = HandedType.None;
+    [SerializeField] private HandedType _handedType = HandedType.Right;
 
+    [Header("TARGET UILIST")]
     [SerializeField] private List<RectTransform> _uiList;
 
+    [Header("TARGET ANCHOR POS BASED ON HANDED TYPE")]
     [SerializeField] private List<Vector2> _leftAnchorPositions = new ();
     [SerializeField] private List<Vector2> _rightAnchorPositions = new ();
-    [SerializeField] private Vector3 _rightLocalSacle = new Vector3(1, 1, 1);
-    [SerializeField] private Vector3 _leftLocalSacle = new Vector3(-1, 1, 1);
 
-    public HandedManager(List<RectTransform> argList)
+    public IngameUIInputSystemHandedManager(List<RectTransform> argList)
     {
         _uiList = argList;
         foreach (var rect in _uiList)
@@ -85,57 +80,38 @@ class HandedManager
             var leftRect = new Vector2(-1 * rect.anchoredPosition.x, rect.anchoredPosition.y);
             _leftAnchorPositions.Add(leftRect);
         }
+
+        // 저장된 HandedPosition을 가져와 세팅한다.
     }
 
     public HandedType GetHandedType() => _handedType;
     public void SetHandedType(HandedType argHandedType) => _handedType = argHandedType;
 
+    public void ChangeHandedType(HandedType argHandedType)
+    {
+        _handedType = argHandedType;
+        SetHanded(argHandedType);
+    }
+
+    // 이 경우 UI의 Pivot이 중간으로 세팅되있어야 한다.
     public void SetHanded(HandedType argType)
     {
         switch (argType)
         {
             case HandedType.Left:
-                SetLocalScale(_leftAnchorPositions);
-                //SetLocalScale(_leftLocalSacle);
+                SetPosition(_leftAnchorPositions);
                 break;
             case HandedType.Right:
-                SetLocalScale(_rightAnchorPositions);
-                //SetLocalScale(_rightLocalSacle);
+                SetPosition(_rightAnchorPositions);
                 break;
         }
     }
 
-    void SetLocalScale(List<Vector2> argList)
+    private void SetPosition(List<Vector2> argList)
     {
         for (int i = 0; i < _uiList.Count; i++)
         {
             _uiList[i].anchoredPosition = argList[i];
         }
     }
-    void SetLocalScale(Vector3 localScale)
-    {
-        foreach (var ui in _uiList)
-        {
-            ui.localScale = localScale;
-        }
-    }
 }
-
-//interface ICustomizeUI
-//{
-//    void SavePosition()
-//    { 
-
-//    }
-
-//    void LoadPosition() 
-//    {
-        
-//    }
-
-//    void UpdatePosition()
-//    { 
-    
-//    }
-
-//}

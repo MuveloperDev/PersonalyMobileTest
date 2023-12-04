@@ -12,6 +12,7 @@ public class IngameUIToolTipBox : MonoBehaviour
     [SerializeField] private List<RectTransform> _textRects;
     [SerializeField] private RectTransform _textRect; 
     [SerializeField] private RectTransform _bgRect; 
+    [SerializeField] private RectTransform _rect; 
     [SerializeField] private Image _bgImage; 
     [SerializeField] private VerticalLayoutGroup _layoutGroup; 
 
@@ -39,6 +40,7 @@ public class IngameUIToolTipBox : MonoBehaviour
     void Start()
     {
         _textRects = GetComponentsInChildren<RectTransform>(true).ToList();
+        _rect = GetComponent<RectTransform>();
         _textTitle.text = title;
         _textCoolTime.text = _coolTime;
         _textDescription.text = _description;
@@ -46,13 +48,16 @@ public class IngameUIToolTipBox : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            OnShow();
-        }
+
     }
-    public void OnShow()
+    public void OnShow(PointerEventData eventData)
     {
+        // 위치 세팅
+        if (null != eventData)
+        {
+            Vector2 temp = new Vector2(0, 60) + eventData.position;
+            _rect.position = temp;
+        }
         // text세팅
 
         // description 및 BG size 세팅

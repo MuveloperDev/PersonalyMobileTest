@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-
-
-public partial class IngameUIStatusEffect : IngameUIEventHandler
+public partial class IngameUIStatusEffect : MonoBehaviour
 {
     public enum IngameUIStatusEffectType
     {
@@ -28,6 +27,7 @@ public partial class IngameUIStatusEffect : IngameUIEventHandler
     [SerializeField] private TextMeshProUGUI _stackText;
     [SerializeField] private IngameUIStatusEffect _statusEffect;
     [SerializeField] private RectTransform _radialEffectRect;
+    [SerializeField] private IngameUIToolTipBox _toolTipBox;
 
     [Header("INFORMATION")]
     [SerializeField] private IngameUIStatusEffectType _type;
@@ -39,9 +39,12 @@ public partial class IngameUIStatusEffect : IngameUIEventHandler
 
     public Action<IngameUIStatusEffect> onDurationEnd;
 
-    public void Initialize()
+    public void Initialize(IngameUIToolTipBox argToolTipBox)
     {
         _radius = new IngameUIRadialProgress(0, this, _dimd, _radialEffectRect);
+        _toolTipBox = argToolTipBox;
+        _button.OnClickDownAddLitener(OnPointerDownEvent);
+        _button.OnClickUpAddLitener(OnPointerUpEvent);
     }
 
     public void OnShow(StatusEffectData argData)
@@ -113,13 +116,15 @@ public partial class IngameUIStatusEffect : IngameUIEventHandler
         _radius.SetTime(_data.duration);
     }
 
-    private void OnPointerDownEvent()
+    private void OnPointerDownEvent(PointerEventData eventData)
     {
-
+        Debug.Log("OnPointerDownEvent");
+        _toolTipBox.OnShow(eventData);
     }
-    private void OnPointerUpEvent()
+    private void OnPointerUpEvent(PointerEventData eventData)
     { 
-
+        Debug.Log("OnPointerUpEvent");
+        _toolTipBox.OnHide();
     }
     private async UniTask OnTextBox()
     { 

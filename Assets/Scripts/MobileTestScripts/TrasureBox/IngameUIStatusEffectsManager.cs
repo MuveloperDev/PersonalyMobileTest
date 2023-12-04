@@ -9,6 +9,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     [SerializeField] private HorizontalLayoutGroup _layoutGroup;
     [SerializeField] private GameObject _disableGroup;
     [SerializeField] private GameObject DescriptionBox;
+    [SerializeField] private IngameUIToolTipBox _toolTipBox;
 
     [Header("DATA INFORMATION")]
     [SerializeField] private List<StatusEffectData> _serverAllocatedStatusEffectList = new();
@@ -25,7 +26,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         _inactiveTaskStatusEffectsList = IngameUIStatusEffectArray.ToList();
         foreach (var statusEffect in _inactiveTaskStatusEffectsList)
         {
-            statusEffect.Initialize();
+            statusEffect.Initialize(_toolTipBox);
             statusEffect.onDurationEnd = MoveInValidEffectsList;
         }
     }

@@ -692,6 +692,7 @@ MonoBehaviour:
     _curCoolTimeValue: 1
   _dimd: {fileID: 7157303936136887174}
   _textCoolTime: {fileID: 8416419835891875282}
+  _btnAnim: {fileID: 0}
   _prevInputType: 0
   _inputType: 0
   _isIgonreUpEvent: 0
@@ -848,6 +849,7 @@ MonoBehaviour:
     _curCoolTimeValue: 1
   _dimd: {fileID: 2104120763463400197}
   _textCoolTime: {fileID: 3049003951512210332}
+  _btnAnim: {fileID: 0}
   _prevInputType: 0
   _inputType: 0
   _isIgonreUpEvent: 0
@@ -2427,6 +2429,7 @@ MonoBehaviour:
     _curCoolTimeValue: 1
   _dimd: {fileID: 6271371576126731138}
   _textCoolTime: {fileID: 0}
+  _btnAnim: {fileID: 0}
   _prevInputType: 0
   _inputType: 0
   _isIgonreUpEvent: 0
@@ -2873,7 +2876,7 @@ MonoBehaviour:
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
-  m_FillClockwise: 1
+  m_FillClockwise: 0
   m_FillOrigin: 2
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1

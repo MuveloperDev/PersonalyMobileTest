@@ -107,8 +107,8 @@ public class IngameUIRadialProgress
                 float x = imageWidth / 2 * Mathf.Sin(radian);
                 float y = imageHeight / 2 * -Mathf.Cos(radian);
 
-                _effectTransform.localPosition = new Vector3(x, y, _effectTransform.localPosition.z);
-                _effectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * radian);
+                _effectTransform.localPosition = new Vector3(-x, y, _effectTransform.localPosition.z);
+                _effectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * -radian);
             }
 
         }

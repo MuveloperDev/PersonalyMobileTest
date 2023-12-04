@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 public class VirtualJoystick : IngameVirtualJoystickBase, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    [SerializeField] IngameUIButtonBase _button;
-    [SerializeField] Vector2 _offset;
+    [SerializeField] private IngameUIButtonBase _button;
+    [SerializeField] private Vector2 _offset;
     private void Awake()
     {
         _button =GetComponent<IngameUIButtonBase>();

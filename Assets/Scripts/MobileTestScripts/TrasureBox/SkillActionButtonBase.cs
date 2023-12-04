@@ -119,13 +119,15 @@ public class SkillActionButtonBase : MonoBehaviour
     [SerializeField] protected Image _dimd;
     [Space]
     [SerializeField] protected TextMeshProUGUI _textCoolTime;
+    [Space]
+    [SerializeField] protected Animator _btnAnim;
+
 
     [Header("TYPE INFO")]
 #if UNITY_EDITOR
     [SerializeField] private InputType _prevInputType;
 #endif
     [SerializeField] private InputType _inputType;
-
 
     [SerializeField] private bool _isIgonreUpEvent;
 
@@ -185,6 +187,7 @@ public class SkillActionButtonBase : MonoBehaviour
         AddLitener();
     }
 
+
     public virtual void ResetCoolTime()
     { 
     }
@@ -211,6 +214,7 @@ public class SkillActionButtonBase : MonoBehaviour
 
     private void DownProcessBasedOnTouchType(PointerEventData eventData)
     {
+
         switch (_inputType)
         {
             case InputType.SingleTouch:

@@ -129,7 +129,7 @@ public class IngameUIButtonBase : IngameUIEventHandler
     }
 
 
-    private void DetectRollOverDragAndDropDestButton()
+    public void DetectRollOverDragAndDropDestButton()
     {
         if (_dragAndDropDestBtn == null)
         {

@@ -18,6 +18,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     [SerializeField] private List<StatusEffectData> _pendingStatusEffectList = new();
 
     [SerializeField] private const int MAX_DISPLAY_STATUS_EFFECT_CNT = 10;
+    [SerializeField] private List<IngameUIStatusEffect> _testStatusEffectsList = new();
 
     // 삭제 추가 리프레사로 나눌것 
     private void Awake()
@@ -27,14 +28,17 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         foreach (var statusEffect in _inactiveTaskStatusEffectsList)
         {
             statusEffect.Initialize(_toolTipBox);
-            statusEffect.onDurationEnd = MoveInValidEffectsList;
+            statusEffect.onDurationEnd = (data) => {
+                Debug.Log("Data " + data.GetGroupId());
+                _testStatusEffectsList.Add(data); 
+            };
         }
     }
-    IngameUIStatusEffect target;
+
     private void Update()
     {
         // 테스트 코드
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q)) // 추가 테스트
         {
             //int Id = Random.Range(1, 15);
             int Id = RandomId();
@@ -42,17 +46,25 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             {
                 groupId = Id,
                 duration = Random.Range(10, 30),
-                type = IngameUIStatusEffect.IngameUIStatusEffectType.Normal
+                maintainType = IngameUIStatusEffect.IngameUIStatusEffectMaintainType.Instance
             };
-            _serverAllocatedStatusEffectList.Add(data);
+            AddStatus(data);
+
         }
-        else if (Input.GetKeyDown(KeyCode.W))
+        else if (Input.GetKeyDown(KeyCode.W)) // 삭제 테스트
         {
-            _serverAllocatedStatusEffectList.RemoveAt(Random.Range(1, _serverAllocatedStatusEffectList.Count()));
+            if (0 != _testStatusEffectsList.Count())
+            {
+                int idx = Random.Range(0, _testStatusEffectsList.Count());
+                var data = _testStatusEffectsList[idx];
+                RemoveStatus(data.GetData().groupId);
+                _testStatusEffectsList.Remove(data);
+            }
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
             _serverAllocatedStatusEffectList.Clear();
+            RefreshData();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
@@ -62,13 +74,13 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             {
                 groupId = Id,
                 duration = Random.Range(10, 30),
-                type = IngameUIStatusEffect.IngameUIStatusEffectType.StackLimitMaxCnt
+                maintainType = IngameUIStatusEffect.IngameUIStatusEffectMaintainType.Passive
             };
             _serverAllocatedStatusEffectList.Add(data);
         }
 
 
-        RefreshData();
+
 
         int RandomId()
         {
@@ -86,6 +98,41 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         }
     }
 
+    public void AddStatus(StatusEffectData argData)
+    {
+        _serverAllocatedStatusEffectList.Add(argData);
+        RefreshData();
+    }
+
+    // 배열로 들어오는지 하나로 들어오는지 확인
+    // 여러개가 동시에 삭제될 수 도 있기 때문.
+    public void RemoveStatus(int argGroupId)
+    {
+        StatusEffectData statusData = new();
+        foreach (var data in _serverAllocatedStatusEffectList)
+        {
+            if (argGroupId == data.groupId)
+            {
+                statusData = data;
+                break;
+            }  
+        }
+        _serverAllocatedStatusEffectList.Remove(statusData);
+
+        IngameUIStatusEffect status = null;
+        foreach (var data in _activeTaskStatusEffectsList)
+        {
+            if (argGroupId == data.GetData().groupId)
+            {
+                status = data;
+                break;
+            }
+        }
+
+        MoveInValidEffectsList(status);
+        RefreshData();
+    }
+
     // 데이터 받을때 콜백으로 사용 예정.
     public void GetCurrentStatusEffect()
     {
@@ -98,6 +145,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     }
 
     // _serverEffectList가 업데이트 된 직후 호출
+    IngameUIStatusEffect target;
     void RefreshData()
     {
         SyncTaskToServer();
@@ -167,7 +215,8 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             }
             foreach (var effect in RemoveTaskInActiveList)
             {
-                effect.OnHide();
+                MoveInValidEffectsList(effect);
+                //effect.OnHide();
             }
         }
         void SeparateStatusEffectsList()
@@ -226,7 +275,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             Debug.LogError("argEffect is not exist in _inVaildEffectsList");
             return;
         }
-        if (argData.type == IngameUIStatusEffect.IngameUIStatusEffectType.StackLimitMaxCnt)
+        if (argData.maintainType == IngameUIStatusEffect.IngameUIStatusEffectMaintainType.Passive)
         {
             target = argEffect;
         }
@@ -240,13 +289,13 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     private void MoveInValidEffectsList(IngameUIStatusEffect argEffect)
     {
         // 테스트 코드
-        for (int i = 0; i < _serverAllocatedStatusEffectList.Count(); i++)
-        {
-            if (_serverAllocatedStatusEffectList[i].groupId == argEffect.GetGroupId())
-            {
-                _serverAllocatedStatusEffectList.RemoveAt(i);
-            }
-        }
+        //for (int i = 0; i < _serverAllocatedStatusEffectList.Count(); i++)
+        //{
+        //    if (_serverAllocatedStatusEffectList[i].groupId == argEffect.GetGroupId())
+        //    {
+        //        _serverAllocatedStatusEffectList.RemoveAt(i);
+        //    }
+        //}
 
         // 대기줄 교체작업
         if (0 != _pendingStatusEffectList.Count())
@@ -265,6 +314,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             return;
         }
         _inactiveTaskStatusEffectsList.Add(argEffect);
+        argEffect.OnHide();
         argEffect.transform.SetParent(_disableGroup.transform);
     }
 }

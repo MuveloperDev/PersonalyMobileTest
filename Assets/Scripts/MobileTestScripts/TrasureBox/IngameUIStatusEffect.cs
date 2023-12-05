@@ -11,12 +11,15 @@ using UnityEngine.UI;
 
 public partial class IngameUIStatusEffect : MonoBehaviour
 {
-    public enum IngameUIStatusEffectType
+    public enum IngameUIStatusEffectMaintainType
     {
-        Normal,
-        StackLimitMaxCnt,
-        StackPassive,
-        StackEffectAmountToMaxStack
+        Instance =0,
+        Passive
+    }
+    public enum IngameStatusEffectBuffType
+    { 
+        Buff = 0,
+        DeBuff
     }
 
     [Header("DEPENDENCY")]
@@ -30,7 +33,7 @@ public partial class IngameUIStatusEffect : MonoBehaviour
     [SerializeField] private IngameUIToolTipBox _toolTipBox;
 
     [Header("INFORMATION")]
-    [SerializeField] private IngameUIStatusEffectType _type;
+    [SerializeField] private IngameUIStatusEffectMaintainType _type;
     [SerializeField] private StatusEffectData _data;
 
     [Header("TYPE CLASSES")]
@@ -43,6 +46,11 @@ public partial class IngameUIStatusEffect : MonoBehaviour
     {
         _radius = new IngameUIRadialProgress(0, this, _dimd, _radialEffectRect);
         _toolTipBox = argToolTipBox;
+        _normalTypeFunc = new(this);
+        _stackTypeFunc = new(this);
+        _normalTypeFunc.onDurationEnd = onDurationEnd;
+        _stackTypeFunc.onDurationEnd = onDurationEnd;
+
         _button.OnClickDownAddLitener(OnPointerDownEvent);
         _button.OnClickUpAddLitener(OnPointerUpEvent);
     }
@@ -51,17 +59,13 @@ public partial class IngameUIStatusEffect : MonoBehaviour
     {
         gameObject.SetActive(true);
         SetData(argData);
-        switch (_data.type)
+        switch (_data.maintainType)
         {
-            case IngameUIStatusEffectType.Normal:
-                _normalTypeFunc = new(this);
-                _normalTypeFunc.OnShow();
+            case IngameUIStatusEffectMaintainType.Instance:
+                _normalTypeFunc.OnShow(this);
                 break;
-            case IngameUIStatusEffectType.StackLimitMaxCnt:
-            case IngameUIStatusEffectType.StackPassive:
-            case IngameUIStatusEffectType.StackEffectAmountToMaxStack:
-                _stackTypeFunc = new(this);
-                _stackTypeFunc.OnShow();
+            case IngameUIStatusEffectMaintainType.Passive:
+                _stackTypeFunc.OnShow(this);
                 break;
         }
     }
@@ -77,16 +81,14 @@ public partial class IngameUIStatusEffect : MonoBehaviour
         gameObject.SetActive(false);
         _radius.Reset();
 
-        switch (_data.type)
+        switch (_data.maintainType)
         {
-            case IngameUIStatusEffectType.Normal:
+            case IngameUIStatusEffectMaintainType.Instance:
                 if (null == _normalTypeFunc)
                     break;
                 _normalTypeFunc.OnHide();
                 break;
-            case IngameUIStatusEffectType.StackLimitMaxCnt:
-            case IngameUIStatusEffectType.StackPassive:
-            case IngameUIStatusEffectType.StackEffectAmountToMaxStack:
+            case IngameUIStatusEffectMaintainType.Passive:
                 if (null == _stackTypeFunc)
                     break;
                 _stackTypeFunc.OnHide();
@@ -94,7 +96,7 @@ public partial class IngameUIStatusEffect : MonoBehaviour
         }
         _stackTypeFunc = null;
         _normalTypeFunc = null;
-        onDurationEnd?.Invoke(this);
+        //onDurationEnd?.Invoke(this);
         _data.Init();
     }
 
@@ -111,19 +113,17 @@ public partial class IngameUIStatusEffect : MonoBehaviour
     // TODO : ±×°Å
     private void SetData(StatusEffectData argData)
     { 
-        _type = argData.type;
+        _type = argData.maintainType;
         _data = argData;
         _radius.SetTime(_data.duration);
     }
 
     private void OnPointerDownEvent(PointerEventData eventData)
     {
-        Debug.Log("OnPointerDownEvent");
         _toolTipBox.OnShow(eventData);
     }
     private void OnPointerUpEvent(PointerEventData eventData)
     { 
-        Debug.Log("OnPointerUpEvent");
         _toolTipBox.OnHide();
     }
     private async UniTask OnTextBox()

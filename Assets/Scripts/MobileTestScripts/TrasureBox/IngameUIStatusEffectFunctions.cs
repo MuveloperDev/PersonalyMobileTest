@@ -11,27 +11,39 @@ using UnityEngine.UI;
 
 public partial class IngameUIStatusEffect
 {
+    public enum StackType
+    {
+        None,
+        MaxCount,
+        MaxCountStackCheckValueMaintain,
+        MaxCountSteckCheckValueDelete
+    }
+
     [Serializable]
     public class IngameUIStatusEffectStackTypeFunction : IngameUIStatusEffectTypeFunction
     {
+        [SerializeField] private StackType _stackType;
+        [SerializeField] private int _stackMaxCount;
+        [SerializeField] private int[] _stackCheckValue;
+        [SerializeField] private int[] _stackEnableStatusEffectIds;
+        // 패시브 상태가 아닌 인스턴스인 경우 듀레이션이 끝나면 쌓여있던 스택은 전부 삭제.
+        // MaxCount까지 스택 쌓을때 마다 상태이상이 Duration 과 틱인터벌타임세컨이 초기화한다.
+        // 맥스 카운트까지 쌓인 상태에서 같은 상태이상이 Duratiom과 틱인터벌 타임 세컨이 초기화된다.
+        // 피해와 스탯 관련 변경 여부는 중첩한다.
         public IngameUIStatusEffectStackTypeFunction(IngameUIStatusEffect argStatusEffect)
          => Initialize(argStatusEffect);
         public override void Initialize(IngameUIStatusEffect argStatusEffect)
         => base.Initialize(argStatusEffect);
 
-        public override void OnShow()
+        public override void OnShow(IngameUIStatusEffect statusEffect)
         {
-            base.OnShow();
+            base.OnShow(statusEffect);
             _stackText.gameObject.SetActive(true);
-            switch (_data.type)
+            switch (_data.maintainType)
             {
-                case IngameUIStatusEffectType.StackLimitMaxCnt:
+                case IngameUIStatusEffectMaintainType.Instance:
                     break;
-                case IngameUIStatusEffectType.StackPassive:
-                    break;
-                case IngameUIStatusEffectType.StackEffectAmountToMaxStack:
-                    break;
-                default:
+                case IngameUIStatusEffectMaintainType.Passive:
                     break;
             }
         }
@@ -65,18 +77,23 @@ public partial class IngameUIStatusEffect
     [Serializable]
     public class IngameUIStatusEffectNormalTypeFunction : IngameUIStatusEffectTypeFunction
     {
+        [SerializeField] private StackType _stackType;
+        [SerializeField] private int _stackMaxCount;
+        [SerializeField] private int[] _stackCheckValue;
+        [SerializeField] private int[] _stackEnableStatusEffectIds;
+
         public IngameUIStatusEffectNormalTypeFunction(IngameUIStatusEffect argStatusEffect)
          => Initialize(argStatusEffect);
         public override void Initialize(IngameUIStatusEffect argStatusEffect)
         => base.Initialize(argStatusEffect);
 
-        public override void OnShow()
+        public override void OnShow(IngameUIStatusEffect statusEffect)
         {
-            base.OnShow();
+            base.OnShow(statusEffect);
             _timeText.text = _data.groupId.ToString();
             _radius.SetTime(_data.duration);
             _radius.Interaction(() => {
-                _statusEffect.OnHide();
+                onDurationEnd?.Invoke(statusEffect);
             });
         }
 
@@ -98,9 +115,9 @@ public partial class IngameUIStatusEffect
         [SerializeField] protected IngameUIStatusEffect _statusEffect;
 
         [Header("INFORMATION")]
-        [SerializeField] protected IngameUIStatusEffect.IngameUIStatusEffectType _type;
+        [SerializeField] protected IngameUIStatusEffect.IngameUIStatusEffectMaintainType _type;
         [SerializeField] protected StatusEffectData _data;
-
+        public Action<IngameUIStatusEffect> onDurationEnd;
         public virtual void Initialize(IngameUIStatusEffect argStatusEffect)
         {
             _statusEffect = argStatusEffect;
@@ -112,24 +129,21 @@ public partial class IngameUIStatusEffect
             _data = _statusEffect._data;
         }
 
-        public virtual void OnShow()
-        {
-        }
+        public virtual void OnShow(IngameUIStatusEffect statusEffect)
+        { }
         public virtual void OnHide()
         { }
-
-
     }
 }
-
-
 
 [Serializable]
 public struct StatusEffectData
 {
     public int groupId;
     public int duration;
-    public IngameUIStatusEffect.IngameUIStatusEffectType type;
+    public IngameUIStatusEffect.IngameUIStatusEffectMaintainType maintainType;
+    public IngameUIStatusEffect.IngameStatusEffectBuffType buffType;
+    public StatucEffectOverlabType overlabType;
     public int stack;
     public void Init()
     {
@@ -138,8 +152,11 @@ public struct StatusEffectData
     }
 }
 
-public enum StatucChangeType
+public enum StatucEffectOverlabType
 {
-    DurationCompareChange = 0,
-    ImeditlyChange = 1,
+    None = 0,
+    LongerHoldingTime,
+    NewStatusEffect,
+    MaintainEexistingStatusQuo,
+    GroupPropertiesAreHigh
 }

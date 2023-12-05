@@ -13,13 +13,17 @@ public partial class IngameUIStatusEffect : MonoBehaviour
 {
     public enum IngameUIStatusEffectMaintainType
     {
+        None = -1,
         Instance =0,
-        Passive
+        Passive,
+        Max
     }
     public enum IngameStatusEffectBuffType
-    { 
+    {
+        None = -1,
         Buff = 0,
-        DeBuff
+        DeBuff,
+        Max
     }
 
     [Header("DEPENDENCY")]
@@ -37,19 +41,15 @@ public partial class IngameUIStatusEffect : MonoBehaviour
     [SerializeField] private StatusEffectData _data;
 
     [Header("TYPE CLASSES")]
-    [SerializeField] private IngameUIStatusEffectStackTypeFunction _stackTypeFunc;
-    [SerializeField] private IngameUIStatusEffectNormalTypeFunction _normalTypeFunc;
-
-    public Action<IngameUIStatusEffect> onDurationEnd;
+    [SerializeField] private IngameUIStatusEffectPassiveTypeFunction _passiveTypeFunc;
+    [SerializeField] private IngameUIStatusEffectInstanceTypeFunction _instanceTypeFunc;
 
     public void Initialize(IngameUIToolTipBox argToolTipBox)
     {
         _radius = new IngameUIRadialProgress(0, this, _dimd, _radialEffectRect);
         _toolTipBox = argToolTipBox;
-        _normalTypeFunc = new(this);
-        _stackTypeFunc = new(this);
-        _normalTypeFunc.onDurationEnd = onDurationEnd;
-        _stackTypeFunc.onDurationEnd = onDurationEnd;
+        _instanceTypeFunc = new(this);
+        _passiveTypeFunc = new(this);
 
         _button.OnClickDownAddLitener(OnPointerDownEvent);
         _button.OnClickUpAddLitener(OnPointerUpEvent);
@@ -62,10 +62,12 @@ public partial class IngameUIStatusEffect : MonoBehaviour
         switch (_data.maintainType)
         {
             case IngameUIStatusEffectMaintainType.Instance:
-                _normalTypeFunc.OnShow(this);
+                _instanceTypeFunc.Initialize(this);
+                _instanceTypeFunc.OnShow(this);
                 break;
             case IngameUIStatusEffectMaintainType.Passive:
-                _stackTypeFunc.OnShow(this);
+                _passiveTypeFunc.Initialize(this);
+                _passiveTypeFunc.OnShow(this);
                 break;
         }
     }
@@ -76,28 +78,31 @@ public partial class IngameUIStatusEffect : MonoBehaviour
         _radius.SetTime(_data.duration);
     }
 
+    public void ResetData()
+    {
+        _radius.Cancle();
+        _data.Init();
+        _dimd.gameObject.SetActive(false);
+
+    }
+
     public void OnHide()
     {
         gameObject.SetActive(false);
-        _radius.Reset();
-
         switch (_data.maintainType)
         {
             case IngameUIStatusEffectMaintainType.Instance:
-                if (null == _normalTypeFunc)
+                if (null == _instanceTypeFunc)
                     break;
-                _normalTypeFunc.OnHide();
+                _instanceTypeFunc.OnHide();
                 break;
             case IngameUIStatusEffectMaintainType.Passive:
-                if (null == _stackTypeFunc)
+                if (null == _passiveTypeFunc)
                     break;
-                _stackTypeFunc.OnHide();
+                _passiveTypeFunc.OnHide();
                 break;
         }
-        _stackTypeFunc = null;
-        _normalTypeFunc = null;
-        //onDurationEnd?.Invoke(this);
-        _data.Init();
+        ResetData();
     }
 
     #region [GET SET FUNCTION]
@@ -110,7 +115,7 @@ public partial class IngameUIStatusEffect : MonoBehaviour
     public StatusEffectData GetData() => _data;
     #endregion
 
-    // TODO : ±×°Å
+
     private void SetData(StatusEffectData argData)
     { 
         _type = argData.maintainType;

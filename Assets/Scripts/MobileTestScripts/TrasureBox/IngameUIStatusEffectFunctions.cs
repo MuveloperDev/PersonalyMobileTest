@@ -20,7 +20,7 @@ public partial class IngameUIStatusEffect
     }
 
     [Serializable]
-    public class IngameUIStatusEffectStackTypeFunction : IngameUIStatusEffectTypeFunction
+    public class IngameUIStatusEffectPassiveTypeFunction : IngameUIStatusEffectTypeFunction
     {
         [SerializeField] private StackType _stackType;
         [SerializeField] private int _stackMaxCount;
@@ -30,7 +30,7 @@ public partial class IngameUIStatusEffect
         // MaxCount까지 스택 쌓을때 마다 상태이상이 Duration 과 틱인터벌타임세컨이 초기화한다.
         // 맥스 카운트까지 쌓인 상태에서 같은 상태이상이 Duratiom과 틱인터벌 타임 세컨이 초기화된다.
         // 피해와 스탯 관련 변경 여부는 중첩한다.
-        public IngameUIStatusEffectStackTypeFunction(IngameUIStatusEffect argStatusEffect)
+        public IngameUIStatusEffectPassiveTypeFunction(IngameUIStatusEffect argStatusEffect)
          => Initialize(argStatusEffect);
         public override void Initialize(IngameUIStatusEffect argStatusEffect)
         => base.Initialize(argStatusEffect);
@@ -39,13 +39,7 @@ public partial class IngameUIStatusEffect
         {
             base.OnShow(statusEffect);
             _stackText.gameObject.SetActive(true);
-            switch (_data.maintainType)
-            {
-                case IngameUIStatusEffectMaintainType.Instance:
-                    break;
-                case IngameUIStatusEffectMaintainType.Passive:
-                    break;
-            }
+            _stackText.text = _data.stack.ToString();
         }
 
         public override void OnHide()
@@ -75,14 +69,14 @@ public partial class IngameUIStatusEffect
     }
 
     [Serializable]
-    public class IngameUIStatusEffectNormalTypeFunction : IngameUIStatusEffectTypeFunction
+    public class IngameUIStatusEffectInstanceTypeFunction : IngameUIStatusEffectTypeFunction
     {
         [SerializeField] private StackType _stackType;
         [SerializeField] private int _stackMaxCount;
         [SerializeField] private int[] _stackCheckValue;
         [SerializeField] private int[] _stackEnableStatusEffectIds;
 
-        public IngameUIStatusEffectNormalTypeFunction(IngameUIStatusEffect argStatusEffect)
+        public IngameUIStatusEffectInstanceTypeFunction(IngameUIStatusEffect argStatusEffect)
          => Initialize(argStatusEffect);
         public override void Initialize(IngameUIStatusEffect argStatusEffect)
         => base.Initialize(argStatusEffect);
@@ -92,9 +86,7 @@ public partial class IngameUIStatusEffect
             base.OnShow(statusEffect);
             _timeText.text = _data.groupId.ToString();
             _radius.SetTime(_data.duration);
-            _radius.Interaction(() => {
-                onDurationEnd?.Invoke(statusEffect);
-            });
+            _radius.Interaction(() => {});
         }
 
         public override void OnHide()
@@ -117,7 +109,7 @@ public partial class IngameUIStatusEffect
         [Header("INFORMATION")]
         [SerializeField] protected IngameUIStatusEffect.IngameUIStatusEffectMaintainType _type;
         [SerializeField] protected StatusEffectData _data;
-        public Action<IngameUIStatusEffect> onDurationEnd;
+
         public virtual void Initialize(IngameUIStatusEffect argStatusEffect)
         {
             _statusEffect = argStatusEffect;
@@ -143,20 +135,25 @@ public struct StatusEffectData
     public int duration;
     public IngameUIStatusEffect.IngameUIStatusEffectMaintainType maintainType;
     public IngameUIStatusEffect.IngameStatusEffectBuffType buffType;
-    public StatucEffectOverlabType overlabType;
+    public StatusEffectOverlabType overlabType;
     public int stack;
     public void Init()
     {
         groupId = -1;
         duration = -1;
+        maintainType = IngameUIStatusEffect.IngameUIStatusEffectMaintainType.None;
+        buffType = IngameUIStatusEffect.IngameStatusEffectBuffType.None;
+        overlabType = StatusEffectOverlabType.None;
+        stack = -1;
     }
 }
 
-public enum StatucEffectOverlabType
+public enum StatusEffectOverlabType
 {
-    None = 0,
-    LongerHoldingTime,
-    NewStatusEffect,
-    MaintainEexistingStatusQuo,
-    GroupPropertiesAreHigh
+    None = -1,
+    LongerHoldingTime,          // 같은 그룹 상태이상일 경우 현재 유지시간을 비교 후 교체 여부를 판단
+    NewStatusEffect,            // 새로 들어오는 상태이상으로 교체
+    MaintainEexistingStatusQuo, // 기존 상태이상 유지 및 신규상태이상 삭제
+    GroupPropertiesAreHigh,     // 기존 상태이상과 GroupPriority 를 비교하여 숫자가 높거나 같을 경우 교체
+    Max
 }

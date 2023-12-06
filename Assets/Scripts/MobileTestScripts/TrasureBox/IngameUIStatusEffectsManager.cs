@@ -18,7 +18,6 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
     [SerializeField] private List<StatusEffectData> _pendingStatusEffectList = new();
 
     [SerializeField] private const int MAX_DISPLAY_STATUS_EFFECT_CNT = 10;
-    [SerializeField] private List<IngameUIStatusEffect> _testStatusEffectsList = new();
 
     // 삭제 추가 리프레사로 나눌것 
     private void Awake()
@@ -28,37 +27,45 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         foreach (var statusEffect in _inactiveTaskStatusEffectsList)
         {
             statusEffect.Initialize(_toolTipBox);
-            statusEffect.onDurationEnd = (data) => {
-                Debug.Log("Data " + data.GetGroupId());
-                _testStatusEffectsList.Add(data); 
-            };
         }
     }
 
     private void Update()
     {
+        // 사실 서버에서 오는 거 그대로 표시만 해주면 되지않나?
+        // 데이터는 Passive와 Instance만 나누어 주고
+        // 그안에서 데이터만 교체해주면 끝 아닌가?
+
+        // 이 부분은 추후 이야기를 좀 더 나누어 보고 작성하는 걸로...
+
         // 테스트 코드
         if (Input.GetKeyDown(KeyCode.Q)) // 추가 테스트
         {
             //int Id = Random.Range(1, 15);
-            int Id = RandomId();
+            int Id = RandomId(50);
+            int maintain = Random.Range(0,(int)IngameUIStatusEffect.IngameUIStatusEffectMaintainType.Max);
+            int buff = Random.Range(0, (int)IngameUIStatusEffect.IngameStatusEffectBuffType.Max);
+            int overlab = Random.Range(0, (int)StatusEffectOverlabType.Max);
+            int _stack = Random.Range(0, 10);
             StatusEffectData data = new StatusEffectData()
             {
                 groupId = Id,
                 duration = Random.Range(10, 30),
-                maintainType = IngameUIStatusEffect.IngameUIStatusEffectMaintainType.Instance
+                maintainType = (IngameUIStatusEffect.IngameUIStatusEffectMaintainType)maintain,
+                buffType = (IngameUIStatusEffect.IngameStatusEffectBuffType)buff,
+                //overlabType = (StatusEffectOverlabType)overlab
+                overlabType = StatusEffectOverlabType.NewStatusEffect,
+                stack = _stack
             };
             AddStatus(data);
 
         }
         else if (Input.GetKeyDown(KeyCode.W)) // 삭제 테스트
         {
-            if (0 != _testStatusEffectsList.Count())
+            if (0 != _serverAllocatedStatusEffectList.Count())
             {
-                int idx = Random.Range(0, _testStatusEffectsList.Count());
-                var data = _testStatusEffectsList[idx];
-                RemoveStatus(data.GetData().groupId);
-                _testStatusEffectsList.Remove(data);
+                var data = _serverAllocatedStatusEffectList[Random.Range(0, _serverAllocatedStatusEffectList.Count())];
+                RemoveStatus(data.groupId);
             }
         }
         else if (Input.GetKeyDown(KeyCode.E))
@@ -66,30 +73,15 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             _serverAllocatedStatusEffectList.Clear();
             RefreshData();
         }
-        else if (Input.GetKeyDown(KeyCode.R))
-        {
-            // 스택형 테스트
-            int Id = RandomId();
-            StatusEffectData data = new StatusEffectData()
-            {
-                groupId = Id,
-                duration = Random.Range(10, 30),
-                maintainType = IngameUIStatusEffect.IngameUIStatusEffectMaintainType.Passive
-            };
-            _serverAllocatedStatusEffectList.Add(data);
-        }
 
-
-
-
-        int RandomId()
+        int RandomId(int maxRange)
         {
             HashSet<int> validGroupIds = new HashSet<int>(_serverAllocatedStatusEffectList.Select(effect => effect.groupId));
-            int Id = Random.Range(1, 50);
+            int Id = Random.Range(0, maxRange);
 
             if (true == validGroupIds.Contains(Id))
             {
-                return RandomId();
+                return RandomId(maxRange);
             }
             else
             {
@@ -118,18 +110,6 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
             }  
         }
         _serverAllocatedStatusEffectList.Remove(statusData);
-
-        IngameUIStatusEffect status = null;
-        foreach (var data in _activeTaskStatusEffectsList)
-        {
-            if (argGroupId == data.GetData().groupId)
-            {
-                status = data;
-                break;
-            }
-        }
-
-        MoveInValidEffectsList(status);
         RefreshData();
     }
 
@@ -301,6 +281,7 @@ public class IngameUIStatusEffectsManager : MonoBehaviour
         if (0 != _pendingStatusEffectList.Count())
         {
             argEffect.transform.SetAsFirstSibling();
+            argEffect.ResetData();
             argEffect.OnShow(_pendingStatusEffectList[0]);
             _pendingStatusEffectList.RemoveAt(0);
             return;

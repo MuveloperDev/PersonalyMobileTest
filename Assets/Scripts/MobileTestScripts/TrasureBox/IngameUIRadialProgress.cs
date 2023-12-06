@@ -21,8 +21,6 @@ public class IngameUIRadialProgress
     [SerializeField] private float _duration;
     [SerializeField] private float _speed;
 
-
-
     public IngameUIRadialProgress(float argDuration, MonoBehaviour argCoroutineRunner,
         Image argRadiusImg, RectTransform argEffectTransform)
     {
@@ -49,7 +47,10 @@ public class IngameUIRadialProgress
 
     public void Cancle()
     {
-        _cts.Cancel();
+        if (true == _isProgress)
+        {
+            _cts.Cancel();
+        }
     }
 
     public CancellationTokenSource GetCTS() => _cts;

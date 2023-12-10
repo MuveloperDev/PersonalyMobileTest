@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class AnimationCurveConvert : MonoBehaviour
 {
@@ -19,7 +17,7 @@ public class AnimationCurveConvert : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -48,7 +46,7 @@ public class AnimationCurveConvert : MonoBehaviour
                     sb.Append($"{serializeCurveData[i]},");
                 }
                 byteData = sb.ToString();
-                Debug.Log( sb.ToString() );
+                Debug.Log(sb.ToString());
             }
         }
         else if (Input.GetKeyDown(KeyCode.K))

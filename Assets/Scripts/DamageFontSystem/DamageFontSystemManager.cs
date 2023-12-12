@@ -61,17 +61,17 @@ public class DamageFontSystemManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.G))
         {
-            float totalDuration = 1.5f;
-            //ScaleCurve(new float[]{2.0f, 1.0f}, totalDuration).Forget();
+            float totalDuration = 1f;
+            ScaleCurve(new float[]{2.0f, 1.0f}, totalDuration).Forget();
             float[][] startCoord = new float[][]{
                 new float[] {0.1f, 0.2f},
                 new float[] {-0.1f, -0.2f}
             };
             float[][] endCoord = new float[][]{
-                new float[] { 0.5f, 0.8f},
+                new float[] { 1f, 1.5f},
                 new float[] { -0.5f, -0.8f }
             };
-            PositionCurve(startCoord, endCoord, totalDuration).Forget();
+            PositionCurve(startCoord, endCoord, totalDuration, 0.5f).Forget();
             //isStart = true;
         }
     }
@@ -79,7 +79,7 @@ public class DamageFontSystemManager : MonoBehaviour
     // 높이를 받으면 포지션 이동에 제약이 생긴다.
     // 이부분은 커브 애니메이션을 건드는게 아니라 
     // 테이블로 관리되어야 한다.
-    private async UniTask PositionCurve(float[][] argStartPos, float[][] argEndPos, float duration)
+    private async UniTask PositionCurve(float[][] argStartPos, float[][] argEndPos, float duration, float height)
     {
         float startX = Random.Range(argStartPos[0][0], argStartPos[0][1]);
         float startY = Random.Range(argStartPos[1][0], argStartPos[1][1]);
@@ -89,26 +89,50 @@ public class DamageFontSystemManager : MonoBehaviour
         Vector2 startCoord = new Vector2(startX, startY);
         Vector2 endCoord = new Vector2(endX, endY);
 
-        // 중간 시간에 해당하는 키프레임 추가
-        Keyframe lastKey = new Keyframe(duration, endCoord.x);
-        Keyframe firstKey = new Keyframe(0, startCoord.x);
-        _positionCurve.MoveKey(_positionCurve.keys.Length - 1, lastKey);
+        // 최초지점과 끝 지점 시간에 해당하는 키프레임 변경
+        Keyframe firstKey = new Keyframe(0, startCoord.y);
         _positionCurve.MoveKey(0, firstKey);
+        Keyframe lastKey = new Keyframe(duration, endCoord.y);
+        _positionCurve.MoveKey(_positionCurve.keys.Length - 1, lastKey);
 
+        #region [CEHCK EXIST KEY]
         float midTime = (_positionCurve.keys[_positionCurve.length - 1].time) / 2;
-        _positionCurve.AddKey(midTime, 2.0f); // 높이는 임의로 1.0f로 설정
+        bool keyExists = false;
+        int middleKeyIdx = 0;
+        foreach (Keyframe key in _positionCurve.keys)
+        {
+            if (Mathf.Approximately(key.time, midTime))
+            {
+                keyExists = true;
+                break;
+            }
+            ++middleKeyIdx;
+        }
+        if (false == keyExists)
+        {
+            _positionCurve.AddKey(midTime, height);
+        }
+        else  
+        {
+            Keyframe middleKey = new Keyframe(midTime, height);
+            _positionCurve.MoveKey(middleKeyIdx, middleKey);
+        }
+        #endregion
 
         float timeElapsed = 0.0f;
-
+        float deltaX = endX - startX;
         while (timeElapsed < duration)
         {
             await UniTask.Yield();
             timeElapsed += Time.deltaTime;
 
-            float curveValue = _positionCurve.Evaluate(timeElapsed);
+            float curveValueY = _positionCurve.Evaluate(timeElapsed);
 
-            float currentX = Mathf.Lerp(startCoord.x, endCoord.x, curveValue);
-            float currentY = Mathf.Lerp(startCoord.y, endCoord.y, curveValue);
+            // x 좌표를 등속으로 이동(느낌이 Lerp가 좋은가 아닌가?)
+            //float currentX = Mathf.Lerp(startCoord.x, endCoord.x, timeElapsed / duration);
+            float currentX = startX + deltaX * (timeElapsed / duration);
+
+            float currentY = curveValueY;
 
             _DamageFont.localPosition = new Vector3(currentX, currentY, _DamageFont.localPosition.z);
         }

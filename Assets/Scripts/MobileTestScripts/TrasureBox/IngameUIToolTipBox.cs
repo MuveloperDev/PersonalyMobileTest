@@ -19,6 +19,7 @@ public class IngameUIToolTipBox : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _textTitle;
     [SerializeField] private TextMeshProUGUI _textCoolTime;
     [SerializeField] private TextMeshProUGUI _textDescription;
+    [SerializeField] private Rect _bgRectOffset;
 
     [SerializeField] private float _widthAlign = 0;
     string title = "TTTTITLE";
@@ -44,11 +45,15 @@ public class IngameUIToolTipBox : MonoBehaviour
         _textTitle.text = title;
         _textCoolTime.text = _coolTime;
         _textDescription.text = _description;
+        _bgRectOffset = _bgRect.rect;
         OnHide();
     }
     private void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            OnShow(null);
+        }
     }
     public void OnShow(PointerEventData eventData)
     {
@@ -61,18 +66,23 @@ public class IngameUIToolTipBox : MonoBehaviour
         // text세팅
 
         // description 및 BG size 세팅
-        _textRect.sizeDelta = new Vector2(_textRect.sizeDelta.x + _widthAlign, _textDescription.preferredHeight);
 
         float totalHeight = 0;
         for (int i = 1; i < _textRects.Count; i++)
         {
+            TextMeshProUGUI tmp = _textRects[i].GetComponent<TextMeshProUGUI>();
+            if (tmp != null)
+            {
+                _textRects[i].sizeDelta = new Vector2(_bgRectOffset.width - (_layoutGroup.padding.right * 2), tmp.preferredHeight);
+            }
+
             totalHeight += _textRects[i].sizeDelta.y;
         }
- 
 
         totalHeight += _layoutGroup.padding.top * 4;
 
-        _bgRect.sizeDelta = new Vector2((_textRect.sizeDelta.x + _widthAlign), totalHeight);
+        _bgRect.sizeDelta = new Vector2(_bgRect.sizeDelta.x, totalHeight);
+
         ReconstructionText();
         gameObject.SetActive(true);
     }

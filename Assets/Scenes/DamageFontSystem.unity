@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -8200,6 +8200,8 @@ GameObject:
   - component: {fileID: 1228943597}
   - component: {fileID: 1228943596}
   - component: {fileID: 1228943595}
+  - component: {fileID: 1228943599}
+  - component: {fileID: 1228943598}
   m_Layer: 5
   m_Name: DamageFont
   m_TagString: Untagged
@@ -8216,7 +8218,7 @@ RectTransform:
   m_GameObject: {fileID: 1228943593}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 1.8737997, y: 1.8737997, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 720125445}
@@ -8226,7 +8228,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.76431286, y: 1.9954189}
   m_SizeDelta: {x: 1, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1228943595
@@ -8293,6 +8295,143 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1228943593}
   m_CullTransparentMesh: 1
+--- !u!114 &1228943598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1228943593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42a0037acbedee747af9e64a7f5f5339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tableId: 1
+  useTable: 0
+  damageType: 0
+  refValueStringId: 0
+  height: 2
+  duration: 1.5
+  positionCurvedXExport: 
+  positionCurvedYExport: 
+  scaleCurvedExport: 
+  fadeTimeSec:
+  - 0.5
+  - 0.5
+  useRandomPositionArray: 0
+  startPositionX:
+  - 0
+  - 0
+  startPositionY:
+  - 0
+  - 0
+  endPositionX:
+  - 0
+  - 0
+  endPositionY:
+  - 0
+  - 0
+  useBold: 1
+  prefabScale:
+  - 2
+  - 1
+  fontColorHex: 
+  useIcon: 0
+  iconPath: 
+  positionXCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.00050735474
+      value: 0.5171318
+      inSlope: 0.7404163
+      outSlope: 0.7404163
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3042899
+      value: 1.483225
+      inSlope: 0.7404163
+      outSlope: 0.7404163
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  positionYCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.00074386597
+      value: 0.5117912
+      inSlope: 2.374804
+      outSlope: 2.374804
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.3020655
+      value: 1.2309041
+      inSlope: 0.2509625
+      outSlope: 0.2509625
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.4961747
+      value: -1.005518
+      inSlope: -1.872879
+      outSlope: -1.872879
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  scaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!225 &1228943599
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1228943593}
+  m_Enabled: 1
+  m_Alpha: 0.7821971
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1490137991
 GameObject:
   m_ObjectHideFlags: 0
@@ -8438,7 +8577,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1992274020}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 66da7051a4cdd5e4f8d681d50abb5feb, type: 3}
   m_Name: 

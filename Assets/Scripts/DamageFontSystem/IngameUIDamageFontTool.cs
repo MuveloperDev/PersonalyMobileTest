@@ -102,10 +102,10 @@ public class IngameUIDamageFontTool : MonoBehaviour
 
     private static async UniTask SetData(DamageFontData data)
     {
-        SetText();
+        //SetText();
         SetBold();
-        SetFontColorHex();
-        SetIcon().Forget();
+        //SetFontColorHex();
+        //SetIcon().Forget();
 
         void SetText()
         {
@@ -456,7 +456,14 @@ public class IngameUIDamageFontToolCustomEditor : Editor
 
         if (GUILayout.Button("PLAY"))
         {
-            OnClickEventPlay();
+            if (false == EditorApplication.isPlaying)
+            {
+                EditorApplication.isPlaying = true;
+            }
+            else
+            {
+                OnClickEventPlay();
+            }
         }
         if (GUILayout.Button("STOP"))
         {
@@ -518,6 +525,10 @@ public class IngameUIDamageFontToolCustomEditor : Editor
         float endXMax = endPositionX.GetArrayElementAtIndex(1).floatValue;
         float endYMin = endPositionY.GetArrayElementAtIndex(0).floatValue;
         float endYMax = endPositionY.GetArrayElementAtIndex(1).floatValue;
+
+        float startScale =  prefabScale.GetArrayElementAtIndex(0).floatValue;
+        float endScale =  prefabScale.GetArrayElementAtIndex(1).floatValue;
+
         DamageFontData data = new DamageFontData()
         {
             Id = 9999,
@@ -531,26 +542,29 @@ public class IngameUIDamageFontToolCustomEditor : Editor
             FadeTimeSec = new float[] { fadeInTimeSec, fadeOutTimeSec },
             StartPositionXY = new float[][]
             {
-                    new float[] {
-                        startXMin, startXMax
-                    },
-                    new float[]
-                    {
-                        startYMin, startYMax
-                    }
+                new float[]
+                {
+                    startXMin, startXMax
+                },
+                new float[]
+                {
+                    startYMin, startYMax
+                }
             },
             EndPositionXY = new float[][]
             {
-                    new float[]
-                    {
-                        endXMin, endXMax
-                    },
-                    new float[]
-                    {
-                        endYMin, endYMax
-                    }
+                new float[]
+                {
+                    endXMin, endXMax
+                },
+                new float[]
+                {
+                    endYMin, endYMax
+                }
             },
             UseBold = useBold.boolValue,
+            // 이부분 내일 추가할 것
+            PrefabScale = new float[] { startScale , endScale },
             FontColorHex = fontColorHex.stringValue,
             UseIcon = useIcon.boolValue,
             IconPath = iconPath.stringValue,

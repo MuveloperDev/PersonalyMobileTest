@@ -10,25 +10,10 @@ public class DamageFontSystemManager : MonoBehaviour
 
     // 데미지폰트 스크립트에 들어가야함.
     [SerializeField] private Vector3 _characterSpinPos;
-    [SerializeField] private float timeElapsed = 0;
 
 
     private void Awake()
     {
-        Debug.Log($"_positionCurve length : {_positionCurve.length} \n");
-        int i =0;
-        foreach (var key in _positionCurve.keys)
-        {
-            Debug.Log($"key{i}Data \n" +
-                $"key.value : {key.value} \n" +
-                $"key.inTangent : {key.inTangent} \n" +
-                $"key.weightedMode : {key.weightedMode} \n" +
-                $"key.outTangent : {key.outTangent} \n" +
-                $"key.time : {key.time} \n" +
-                $"key.inWeight : {key.inWeight} \n" +
-                $"key.outWeight : {key.outWeight} \n");
-            i++;
-        }
     }
 
     void Start()
@@ -64,7 +49,7 @@ public class DamageFontSystemManager : MonoBehaviour
             float totalDuration = 1f;
             ScaleCurve(new float[]{2.0f, 1.0f}, totalDuration).Forget();
             float[][] startCoord = new float[][]{
-                new float[] {0.1f, 0.2f},
+                new float[] {-0.1f, -0.2f},
                 new float[] {-0.1f, -0.2f}
             };
             float[][] endCoord = new float[][]{

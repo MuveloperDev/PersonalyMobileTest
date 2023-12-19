@@ -459,6 +459,7 @@ public class IngameUIDamageFontToolCustomEditor : Editor
             if (false == EditorApplication.isPlaying)
             {
                 EditorApplication.isPlaying = true;
+                //sss
             }
             else
             {

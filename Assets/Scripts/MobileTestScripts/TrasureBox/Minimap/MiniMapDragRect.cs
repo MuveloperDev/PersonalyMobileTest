@@ -40,6 +40,7 @@ public class MiniMapDragRect : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
 
     }
+
     private Vector2 ScreenPointToLocalPointInRectangle(PointerEventData eventData)
     {
         Vector2 rectPosition;

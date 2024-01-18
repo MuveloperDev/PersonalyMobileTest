@@ -48,7 +48,6 @@ public class Minimap : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, ID
     {
         // Drag 이벤트가 발생했을 때 실행될 코드
         Vector2 rectPosition;
-        Vector2 worldPosition = Vector2.one;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(miniMapRect, eventData.position, eventData.pressEventCamera, out rectPosition))
         {
             bool xExceeded = Mathf.Abs(rectPosition.x) > miniMapSize.x / 2;

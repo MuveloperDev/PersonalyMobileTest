@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class Minimap : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private CameraMove cm;
-    [SerializeField] private Image myImage;
     [SerializeField] private RectTransform miniMapRect;
     [SerializeField] private RectTransform cmViewUI;
     [SerializeField] private Vector2 miniMapSize;
@@ -16,7 +15,6 @@ public class Minimap : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, ID
     // Start is called before the first frame update
     void Start()
     {
-        myImage= GetComponent<Image>();
         miniMapSize = miniMapRect.sizeDelta;
         worldMapSize = new Vector2(820, 820);
     }
